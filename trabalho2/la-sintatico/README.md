@@ -39,7 +39,7 @@ java -jar <caminho-corretor> "java -jar <caminho-analisador>" gcc <diretório-sa
 Exemplo:
 
 ```
-java -jar "$PWD/corretor.jar" "java -jar $PWD/analisador-sintatico.jar" gcc "$PWD/tmp/" "$PWD/casos-de-teste/" "760648, 795314" sintatico
+java -jar "$PWD/corretor.jar" "java -jar $PWD/sintatico.jar" gcc "$PWD/tmp/" "$PWD/casos-de-teste/" "760648, 795314" sintatico
 ```
 
 O programa executará todos os casos de teste do analisador sintático e apresentará o resultado no final.
