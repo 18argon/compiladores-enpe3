@@ -1,0 +1,5 @@
+grammar LA;
+
+hello:
+    'world'
+    ;
