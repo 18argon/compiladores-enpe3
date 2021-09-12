@@ -2,7 +2,7 @@ grammar LA;
 
 //Identificadores, nomes das variáveis
 IDENT
-    : ('a'..'z' | 'A'..'Z' | '_')('a'..'z'| 'A'..'Z' | '0'..'9' | '_')*
+    : ('a'..'z' | 'A'..'Z' | '_') ('a'..'z'| 'A'..'Z' | '0'..'9' | '_')*
     ;
 
 //Números inteiros
@@ -12,7 +12,7 @@ NUM_INT
 
 //Números reais
 NUM_REAL
-    : ('0'..'9')+('.'('0'..'9')+)?
+    : ('0'..'9')+ ('.'('0'..'9')+)?
     ;
 
 //Cadeia de letras e caracteres entre aspas duplas
@@ -32,7 +32,9 @@ WS
     ;
 
 //Comentários dentro do programa
-COMENTARIO: '{' ( ~('\n') )*? '}' {skip();};
+COMENTARIO
+    : '{' ( ~('\n') )*? '}' {skip();}
+    ;
 
 programa
     : declaracoes 'algoritmo' corpo 'fim_algoritmo'
@@ -187,29 +189,31 @@ op_unario
     ;
 
 exp_aritmetica
-    : termo (OP_ARIT1 termo)*
+    : termo (op_arit1 termo)*
     ;
 
 termo
-    : fator (OP_ARIT2 fator)*
+    : fator (op_arit2 fator)*
     ;
 
 fator
-    : parcela (OP_ARIT3 parcela)*
+    : parcela (op_arit3 parcela)*
     ;
 
 //Operadores aritméticos
-OP_ARIT1
+op_arit1
     : '+'
     | '-'
     ;
 
-OP_ARIT2
+op_arit2
     : '*'
     | '/'
     ;
 
-OP_ARIT3: '%';
+op_arit3
+    : '%'
+    ;
 
 parcela
     : (op_unario)? parcela_unario
@@ -229,11 +233,11 @@ parcela_nao_unario
     | CADEIA;
 
 exp_relacional
-    : exp_aritmetica (OP_REL exp_aritmetica)?
+    : exp_aritmetica (op_relacional exp_aritmetica)?
     ;
 
 //Operadores relacionais
-OP_REL
+op_relacional
     : '='
     | '<>'
     | '>='
@@ -243,11 +247,11 @@ OP_REL
     ;
 
 expressao
-    : termo_logico (OP_LOG1 termo_logico)*
+    : termo_logico (op_log1 termo_logico)*
     ;
 
 termo_logico
-    : fator_logico (OP_LOG2 fator_logico)*
+    : fator_logico (op_log2 fator_logico)*
     ;
 
 fator_logico
@@ -259,11 +263,11 @@ parcela_logica
     | exp_relacional
     ;
 
-OP_LOG1
+op_log1
     : 'ou'
     ;
 
-OP_LOG2
+op_log2
     : 'e'
     ;
 
