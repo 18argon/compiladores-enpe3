@@ -3,7 +3,18 @@ package br.ufscar.dc.compiladores.la.semantico;
 import java.util.LinkedList;
 
 public class Escopos {
-    private final LinkedList<TabelaDeSimbolos> pilhaDeEscopos;
+    static class Escopo {
+        TabelaDeSimbolos tabela;
+        TiposLA.TipoLA tipoDeRetorno;
+
+        Escopo(TabelaDeSimbolos tabela, TiposLA.TipoLA tipoDeRetorno) {
+            this.tabela = tabela;
+            this.tipoDeRetorno = tipoDeRetorno;
+        }
+    }
+
+
+    private final LinkedList<Escopo> pilhaDeEscopos;
 
     public Escopos() {
         pilhaDeEscopos = new LinkedList<>();
@@ -12,27 +23,36 @@ public class Escopos {
 
     public void init() {
         pilhaDeEscopos.clear();
-        criarNovoEscopo();
+        criarNovoEscopo(null);
     }
 
-    public void criarNovoEscopo() {
-        pilhaDeEscopos.push(new TabelaDeSimbolos());
+    public void criarNovoEscopo(TiposLA.TipoLA tipo) {
+        pilhaDeEscopos.push(new Escopo(new TabelaDeSimbolos(), tipo));
     }
 
     public TabelaDeSimbolos obterEscopoAtual() {
-        return pilhaDeEscopos.peek();
+        Escopo escopo = pilhaDeEscopos.peek();
+        if (escopo == null) return null;
+        return pilhaDeEscopos.peek().tabela;
     }
 
     public TabelaDeSimbolos obterEscopoGlobal() {
-        return pilhaDeEscopos.getLast();
+        return pilhaDeEscopos.getLast().tabela;
     }
-//
+
 //    public List<TabelaDeSimbolos> percorrerEscoposAninhados() {
 //        return pilhaDeTabelas;
 //    }
 
+
     public void abandonarEscopo() {
         pilhaDeEscopos.pop();
+    }
+
+    public TiposLA.TipoLA obterTipoDeRetorno() {
+        Escopo escopo = pilhaDeEscopos.peek();
+        if (escopo == null) return null;
+        return pilhaDeEscopos.peek().tipoDeRetorno;
     }
 
     public TabelaDeSimbolos.EntradaTabelaDeSimbolos verificar(String identificador) {

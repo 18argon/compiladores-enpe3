@@ -23,7 +23,7 @@ variavel
     ;
 
 identificador
-    : IDENT ('.' IDENT)* dimensao
+    : id1=IDENT ('.' outrosIds+=IDENT)* dimensao
     ;
 
 dimensao
@@ -110,7 +110,7 @@ cmdCaso
     ;
 
 cmdPara
-    : 'para' IDENT '<-' exp_aritmetica 'ate' exp_aritmetica 'faca' (cmd)* 'fim_para'
+    : 'para' IDENT '<-' expInicio=exp_aritmetica 'ate' expFim=exp_aritmetica 'faca' (cmd)* 'fim_para'
     ;
 
 cmdEnquanto
@@ -153,15 +153,15 @@ op_unario
     ;
 
 exp_aritmetica
-    : termo (OP_ARITIMETICO1 termo)*
+    : termo1=termo (OP_ARITIMETICO1 outrosTermos+=termo)*
     ;
 
 termo
-    : fator (OP_ARITIMETICO2 fator)*
+    : fator1=fator (OP_ARITIMETICO2 outrosFatores+=fator)*
     ;
 
 fator
-    : parcela (OP_ARITIMETICO3 parcela)*
+    : parcela1=parcela (OP_ARITIMETICO3 outrasParcelas+=parcela)*
     ;
 
 
@@ -172,10 +172,10 @@ parcela
 
 parcela_unario
     : ('^')? identificador
-    | IDENT '(' expressao (',' expressao)* ')'
+    | IDENT '(' args+=expressao (',' args+=expressao)* ')'
     | NUM_INT
     | NUM_REAL
-    | '(' expressao ')'
+    | '(' expParam=expressao ')'
     ;
 
 parcela_nao_unario
@@ -183,16 +183,16 @@ parcela_nao_unario
     | CADEIA;
 
 exp_relacional
-    : exp_aritmetica (OP_RELACIONAL exp_aritmetica)?
+    : exp1=exp_aritmetica (OP_RELACIONAL exp2=exp_aritmetica)?
     ;
 
 
 expressao
-    : termo_logico (OP_LOGICO1 termo_logico)*
+    : termo1=termo_logico (OP_LOGICO1 outrosTermos+=termo_logico)*
     ;
 
 termo_logico
-    : fator_logico (OP_LOGICO2 fator_logico)*
+    : fator1=fator_logico (OP_LOGICO2 outrosFatores+=fator_logico)*
     ;
 
 fator_logico

@@ -2,7 +2,6 @@ package br.ufscar.dc.compiladores.la.semantico;
 
 import br.ufscar.dc.compiladores.la.semantico.TiposLA.TipoLA;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -36,7 +35,14 @@ public class LASemantico extends LABaseVisitor<Void> {
 
         } else {
             String identificador = ctx.IDENT().getText();
-//            TabelaDeSimbolos.TipoLA tipo = LASemanticoUtils.verificarTipo(ctx.tipo());
+            TabelaDeSimbolos.EntradaTabelaDeSimbolos etds = escopos.verificar(identificador);
+            if (etds != null) {
+                // TODO: Erro - identificador em uso
+            }
+
+            if (ctx.tipo().start.getText().equals("registro")) {
+
+            }
             // TODO:
 //            visitTipo(ctx.tipo());
         }
@@ -71,9 +77,15 @@ public class LASemantico extends LABaseVisitor<Void> {
     public Void visitDeclaracao_global(LAParser.Declaracao_globalContext ctx) {
         TipoLA tipo;
 
-        escopos.criarNovoEscopo();
         String start = ctx.start.getText();
         String identificador = ctx.IDENT().getText();
+        TipoLA tipoRetorno = TiposLA.INVALIDO;
+        if (start.equals("procedimento")) {
+            escopos.criarNovoEscopo(null);
+        } else { // funcao
+            tipoRetorno = LASemanticoUtils.verificarTipo(escopos, ctx.tipo_estendido());
+            escopos.criarNovoEscopo(tipoRetorno);
+        }
 
         Map<String, TipoLA> tiposParametros = new HashMap<>();
         // checar os parametros
@@ -93,7 +105,6 @@ public class LASemantico extends LABaseVisitor<Void> {
         if (start.equals("procedimento")) {
             tipo = new TiposLA.Procedimento(tiposParametros);
         } else { // funcao
-            TipoLA tipoRetorno = LASemanticoUtils.verificarTipo(escopos, ctx.tipo_estendido());
             tipo = new TiposLA.Funcao(tiposParametros, tipoRetorno);
         }
 
@@ -109,6 +120,122 @@ public class LASemantico extends LABaseVisitor<Void> {
         return super.visitDeclaracao_global(ctx);
     }
 
+    @Override
+    public Void visitCmdLeia(LAParser.CmdLeiaContext ctx) {
+        return super.visitCmdLeia(ctx);
+    }
 
+
+    @Override
+    public Void visitCmdSe(LAParser.CmdSeContext ctx) {
+        TipoLA tipoExp = LASemanticoUtils.verificarTipo(escopos, ctx.expressao());
+        if (tipoExp != TiposLA.LOGICO) {
+            // TODO: algum erro
+        }
+        ctx.cmd().forEach(this::visitCmd);
+//        return super.visitCmdSe(ctx);
+        return null;
+    }
+
+    @Override
+    public Void visitCmdCaso(LAParser.CmdCasoContext ctx) {
+        TipoLA tipoExp = LASemanticoUtils.verificarTipo(escopos, ctx.exp_aritmetica());
+        if (tipoExp != TiposLA.INTEIRO) {
+            // TODO: Algum erro
+        }
+
+//        ctx.selecao().item_selecao().forEach(this::visitItem_selecao);
+
+        ctx.cmd().forEach(this::visitCmd);
+
+//        return super.visitCmdCaso(ctx);
+        return null;
+    }
+
+    @Override
+    public Void visitCmdPara(LAParser.CmdParaContext ctx) {
+        TabelaDeSimbolos.EntradaTabelaDeSimbolos etds = escopos.verificar(ctx.IDENT().getText());
+        if (etds == null) {
+            // TODO: erro - variavel nao declarada
+        } else if (etds.tipo != TiposLA.INTEIRO) {
+            // TODO: erro - tipo de variavel errado
+        }
+
+        ctx.cmd().forEach(this::visitCmd);
+
+//        return super.visitCmdPara(ctx);
+        return null;
+    }
+
+    @Override
+    public Void visitCmdEnquanto(LAParser.CmdEnquantoContext ctx) {
+        TipoLA tipoExp = LASemanticoUtils.verificarTipo(escopos, ctx.expressao());
+        if (tipoExp != TiposLA.LOGICO) {
+            // TODO: Algum erro
+        }
+
+        ctx.cmd().forEach(this::visitCmd);
+//        return super.visitCmdEnquanto(ctx);
+        return null;
+    }
+
+    @Override
+    public Void visitCmdFaca(LAParser.CmdFacaContext ctx) {
+        TipoLA tipoExp = LASemanticoUtils.verificarTipo(escopos, ctx.expressao());
+        if (tipoExp != TiposLA.LOGICO) {
+            // TODO: Algum erro
+        }
+
+        ctx.cmd().forEach(this::visitCmd);
+//        return super.visitCmdFaca(ctx);
+        return null;
+    }
+
+    @Override
+    public Void visitCmdAtribuicao(LAParser.CmdAtribuicaoContext ctx) {
+        TipoLA tipoId = LASemanticoUtils.verificarTipo(escopos, ctx.identificador());
+
+        if (tipoId == TiposLA.INVALIDO) {
+            // TODO: variavel não declarada
+        } else if (ctx.start.getText().equals("^")) {
+            if (tipoId instanceof TiposLA.Endereco) {
+                tipoId = ((TiposLA.Endereco) tipoId).tipoConteudo;
+            } else {
+                tipoId = TiposLA.INVALIDO;
+            }
+        }
+
+        TipoLA tipoExp = LASemanticoUtils.verificarTipo(escopos, ctx.expressao());
+
+        if (tipoId != tipoExp) {
+            // TODO: erro - atribuicao incompativel
+        }
+
+//        return super.visitCmdAtribuicao(ctx);
+        return null;
+    }
+
+    @Override
+    public Void visitCmdRetorne(LAParser.CmdRetorneContext ctx) {
+        TipoLA tipoRetorno = LASemanticoUtils.verificarTipo(escopos, ctx.expressao());
+        if (escopos.obterTipoDeRetorno() == null) {
+            // TODO: erro - uso inapropriado do comando retorne
+        } else if (tipoRetorno != escopos.obterTipoDeRetorno()) {
+            // TODO: Mostrar algum erro
+        }
+
+        return super.visitCmdRetorne(ctx);
+    }
+
+    @Override
+    public Void visitIdentificador(LAParser.IdentificadorContext ctx) {
+        TabelaDeSimbolos.EntradaTabelaDeSimbolos etds = escopos.verificar(ctx.getText());
+        if (etds == null) {
+            // TODO: erro - variavel não declarada
+            // Talvez seja preciso diferenciar endereços
+        }
+
+        return null;
+    }
 
 }
