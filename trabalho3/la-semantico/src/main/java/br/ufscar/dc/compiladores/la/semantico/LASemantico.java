@@ -25,6 +25,8 @@ public class LASemantico extends LABaseVisitor<Void> {
     public Void visitDeclaracao_local(LAParser.Declaracao_localContext ctx) {
         String start = ctx.start.getText();
         if (start.equals("declare")) {
+            //verificação da declaração de variáveis
+
             visitVariavel(ctx.variavel());
         } else if (start.equals("constante")) {
             //verificação da declação de constantes
@@ -153,6 +155,9 @@ public class LASemantico extends LABaseVisitor<Void> {
                 String strPid = pid.getText();
                 if (escopos.verificar(strPid) != null) {
                     // TODO: erro - nome de parametro já declarado
+                    LASemanticoUtils.adicionarErroSemantico(
+                            pid.start,
+                            String.format(Mensagens.ERRO_IDENTIFICADOR_JA_DECLARADO, strPid));
                 } else {
                     TipoLA tipoParametro = LASemanticoUtils.verificarTipo(escopos, parametro.tipo_estendido());
                     tiposParametros.add(tipoParametro);
@@ -209,6 +214,9 @@ public class LASemantico extends LABaseVisitor<Void> {
         EntradaTabelaDeSimbolos etds = escopos.verificar(ctx.IDENT().getText());
         if (etds == null) {
             // TODO: erro - variavel nao declarada
+            LASemanticoUtils.adicionarErroSemantico(
+                    ctx.IDENT().getSymbol(),
+                    String.format(Mensagens.ERRO_IDENTIFICADOR_NAO_DECLARADO, ctx.IDENT()));
         } else if (etds.tipo != TiposLA.INTEIRO) {
             // TODO: erro - tipo de variavel errado
         }
@@ -270,6 +278,13 @@ public class LASemantico extends LABaseVisitor<Void> {
         } else if (tipoId != tipoExp && tipoId != TiposLA.INVALIDO) {
             // Não atribuir se a variavel não existe
             // TODO: erro - atribuicao incompativel
+            String strId = ctx.identificador().getText();
+            strId = ctx.start.getText().equals("^") ? "^" + strId : strId;
+            LASemanticoUtils.adicionarErroSemantico(
+                    ctx.identificador().start,
+                    String.format(
+                            Mensagens.ERRO_ATRIBUICAO_NAO_COMPATIVEL,
+                            strId));
         }
 
         return null;
@@ -280,6 +295,9 @@ public class LASemantico extends LABaseVisitor<Void> {
         TipoLA tipoRetorno = LASemanticoUtils.verificarTipo(escopos, ctx.expressao());
         if (escopos.obterTipoDeRetorno() == null) {
             // TODO: erro - uso inapropriado do comando retorne
+            LASemanticoUtils.adicionarErroSemantico(
+                    ctx.start,
+                    Mensagens.ERRO_RETORNE_NAO_PERMITIDO);
         } else if (tipoRetorno != escopos.obterTipoDeRetorno()) {
             // TODO: Mostrar algum erro
         }
@@ -312,6 +330,9 @@ public class LASemantico extends LABaseVisitor<Void> {
         } else {
             // TODO: erro - variavel não declarada
             // Talvez seja preciso diferenciar endereços
+            LASemanticoUtils.adicionarErroSemantico(
+                    ctx.start,
+                    String.format(Mensagens.ERRO_IDENTIFICADOR_NAO_DECLARADO, ctx.getText()));
         }
 
         return null;
