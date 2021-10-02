@@ -55,8 +55,8 @@ public class Escopos {
         return pilhaDeEscopos.peek().tipoDeRetorno;
     }
 
-    public TabelaDeSimbolos.EntradaTabelaDeSimbolos verificar(String identificador) {
-        TabelaDeSimbolos.EntradaTabelaDeSimbolos etds = obterEscopoAtual().verificar(identificador);
+    public EntradaTabelaDeSimbolos verificar(String identificador) {
+        EntradaTabelaDeSimbolos etds = obterEscopoAtual().verificar(identificador);
         if (etds == null) {
             etds = obterEscopoGlobal().verificar(identificador);
         }

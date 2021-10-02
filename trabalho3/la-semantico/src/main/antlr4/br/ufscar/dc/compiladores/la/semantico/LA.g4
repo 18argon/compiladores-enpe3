@@ -5,7 +5,7 @@ programa
     ;
 
 declaracoes
-    : (decl_local_global)*
+    : decl_local_global*
     ;
 
 decl_local_global
@@ -48,7 +48,7 @@ tipo_basico_ident
     ;
 
 tipo_estendido
-    : ('^')? tipo_basico_ident
+    : OP_PONTEIRO? tipo_basico_ident
     ;
 
 valor_constante
@@ -60,16 +60,16 @@ valor_constante
     ;
 
 registro
-    : 'registro' (variavel)* 'fim_registro'
+    : 'registro' variavel* 'fim_registro'
     ;
 
 declaracao_global
-    : 'procedimento' IDENT '(' (parametros)? ')' (declaracao_local)* (cmd)* 'fim_procedimento'
-    | 'funcao' IDENT '(' (parametros)? ')' ':' tipo_estendido (declaracao_local)* (cmd)* 'fim_funcao'
+    : 'procedimento' IDENT '(' parametros? ')' declaracao_local* cmd* 'fim_procedimento'
+    | 'funcao' IDENT '(' parametros? ')' ':' tipo_estendido declaracao_local* cmd* 'fim_funcao'
     ;
 
 parametro
-    : ('var')? identificador (',' identificador)* ':' tipo_estendido
+    : 'var'? identificador (',' identificador)* ':' tipo_estendido
     ;
 
 parametros
@@ -77,7 +77,7 @@ parametros
     ;
 
 corpo
-    : (declaracao_local)* (cmd)*
+    : declaracao_local* cmd*
     ;
 
 cmd
@@ -94,7 +94,7 @@ cmd
     ;
 
 cmdLeia
-    : 'leia' '(' ('^')? identificador (',' ('^')? identificador)* ')'
+    : 'leia' '(' OP_PONTEIRO? identificador (',' OP_PONTEIRO? identificador)* ')'
     ;
 
 cmdEscreva
@@ -102,27 +102,28 @@ cmdEscreva
     ;
 
 cmdSe
-    : 'se' expressao 'entao' (cmd)* ('senao' (cmd)*)? 'fim_se'
+    : 'se' expressao 'entao' cmd* ('senao' cmd*)? 'fim_se'
     ;
 
 cmdCaso
-    : 'caso' exp_aritmetica 'seja' selecao ('senao' (cmd)*)? 'fim_caso'
+    : 'caso' exp_aritmetica 'seja' selecao ('senao' cmd*)? 'fim_caso'
     ;
 
 cmdPara
-    : 'para' IDENT '<-' expInicio=exp_aritmetica 'ate' expFim=exp_aritmetica 'faca' (cmd)* 'fim_para'
+    : 'para' IDENT '<-' expInicio=exp_aritmetica 'ate' expFim=exp_aritmetica 'faca' cmd* 'fim_para'
     ;
 
 cmdEnquanto
-    : 'enquanto' expressao 'faca' (cmd)* 'fim_enquanto'
+    : 'enquanto' expressao 'faca' cmd* 'fim_enquanto'
     ;
 
 cmdFaca
-    : 'faca' (cmd)* 'ate' expressao
+    : 'faca' cmd* 'ate' expressao
     ;
 
 cmdAtribuicao
-    : ('^')? identificador '<-' expressao;
+    : OP_PONTEIRO? identificador '<-' expressao
+    ;
 
 cmdChamada
     : IDENT '(' expressao (',' expressao)* ')'
@@ -133,11 +134,11 @@ cmdRetorne
     ;
 
 selecao
-    : (item_selecao)*
+    : item_selecao*
     ;
 
 item_selecao
-    : constantes ':' (cmd)*
+    : constantes ':' cmd*
     ;
 
 constantes
@@ -145,12 +146,9 @@ constantes
     ;
 
 numero_intervalo
-    : (op_unario)? NUM_INT ('..' (op_unario)? NUM_INT)?
+    : OP_UNARIO? NUM_INT ('..' OP_UNARIO? NUM_INT)?
     ;
 
-op_unario
-    : '-'
-    ;
 
 exp_aritmetica
     : termo1=termo (OP_ARITIMETICO1 outrosTermos+=termo)*
@@ -166,12 +164,12 @@ fator
 
 
 parcela
-    : (op_unario)? parcela_unario
+    : OP_UNARIO? parcela_unario
     | parcela_nao_unario
     ;
 
 parcela_unario
-    : ('^')? identificador
+    : OP_PONTEIRO? identificador
     | IDENT '(' args+=expressao (',' args+=expressao)* ')'
     | NUM_INT
     | NUM_REAL
@@ -179,11 +177,11 @@ parcela_unario
     ;
 
 parcela_nao_unario
-    : '&' identificador
+    : OP_ENDERECO identificador
     | CADEIA;
 
 exp_relacional
-    : exp1=exp_aritmetica (OP_RELACIONAL exp2=exp_aritmetica)?
+    : exp1=exp_aritmetica (op_relacional exp2=exp_aritmetica)?
     ;
 
 
@@ -196,12 +194,12 @@ termo_logico
     ;
 
 fator_logico
-    : ('nao')? parcela_logica
+    : 'nao'? parcela_logica
     ;
 
 parcela_logica
-    : ('verdadeiro' | 'falso')
-    | exp_relacional
+    : exp_relacional
+    | ('verdadeiro' | 'falso')
     ;
 
 OP_ARITIMETICO1
@@ -214,13 +212,16 @@ OP_ARITIMETICO2
     | '/'
     ;
 
+OP_UNARIO
+    : '-'
+    ;
+
 OP_ARITIMETICO3
     : '%'
     ;
 
 
 OP_LOGICO1
-
     : 'ou'
     ;
 
@@ -228,15 +229,22 @@ OP_LOGICO2
     : 'e'
     ;
 
-OP_RELACIONAL
-    : '='
-    | '<>'
-    | '>='
-    | '<='
-    | '>'
+op_relacional
+    : '<>'
+    | '='
     | '<'
+    | '<='
+    | '>='
+    | '>'
     ;
 
+OP_PONTEIRO
+    : '^'
+    ;
+
+OP_ENDERECO
+    : '&'
+    ;
 
 //Identificadores, nomes das variáveis
 IDENT
@@ -266,12 +274,12 @@ ESC_SEQ
 
 //Espaços em branco: pular linha, tabulação
 WS
-    : (' ' | '\n' | '\r' | '\t') {skip();}
+    : [ \n\r\t] -> skip
     ;
 
 //Comentários dentro do programa
 COMENTARIO
-    : '{' ( ~('\n') )*? '}' {skip();}
+    : '{' ( ~('\n') )*? '}' -> skip
     ;
 
 //Qualquer caractere que não faça parte do conjunto léxico

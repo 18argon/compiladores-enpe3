@@ -2,7 +2,9 @@ package br.ufscar.dc.compiladores.la.semantico;
 
 import br.ufscar.dc.compiladores.la.semantico.TiposLA.TipoLA;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -25,28 +27,65 @@ public class LASemantico extends LABaseVisitor<Void> {
         if (start.equals("declare")) {
             visitVariavel(ctx.variavel());
         } else if (start.equals("constante")) {
-            String identificador = ctx.IDENT().getText();
-            TiposLA.TipoLA tipo = LASemanticoUtils.verificarTipo(ctx.tipo_basico());
-            String valor = ctx.valor_constante().getText();
+            //verificação da declação de constantes
 
-            // TODO: verificar erro de atribuição
+            String strId = ctx.IDENT().getText();
+            TiposLA.TipoLA tipoId = LASemanticoUtils.verificarTipo(ctx.tipo_basico());
+            TipoLA tipoValor = LASemanticoUtils.verificarTipo(ctx.valor_constante());
 
-            escopos.obterEscopoAtual().adicionar(identificador, tipo, valor);
+            if (tipoId != tipoValor) {
+                LASemanticoUtils.adicionarErroSemantico(
+                        ctx.IDENT().getSymbol(),
+                        String.format(Mensagens.ERRO_ATRIBUICAO_NAO_COMPATIVEL, strId)
+                );
+                // TODO: verificar erro de atribuição
+
+            }
+
+            escopos.obterEscopoAtual().adicionar(strId, tipoId);
 
         } else {
-            String identificador = ctx.IDENT().getText();
-            TabelaDeSimbolos.EntradaTabelaDeSimbolos etds = escopos.verificar(identificador);
+            // verificação da declaração de tipos
+
+            String strId = ctx.IDENT().getText();
+            EntradaTabelaDeSimbolos etds = escopos.verificar(strId);
             if (etds != null) {
-                // TODO: Erro - identificador em uso
+                // TODO: Erro - identificador já declarado
+                LASemanticoUtils.adicionarErroSemantico(
+                        ctx.IDENT().getSymbol(),
+                        String.format(Mensagens.ERRO_IDENTIFICADOR_JA_DECLARADO, strId));
             }
 
             if (ctx.tipo().start.getText().equals("registro")) {
-
+                // verificaç
+                Map<String, TipoLA> campos = new HashMap<>();
+                for (var variavel : ctx.tipo().registro().variavel()) {
+                    TipoLA tipoVar = LASemanticoUtils.verificarTipo(escopos, variavel.tipo());
+                    for (var varId : variavel.identificador()) {
+                        // TODO: Talvez seja preciso mudar a gramática para não aceitar pontos
+                        String idVar = varId.id1.getText();
+                        if (campos.containsKey(idVar)) {
+                            // TODO: identificador já declarado
+                            LASemanticoUtils.adicionarErroSemantico(
+                                    ctx.IDENT().getSymbol(),
+                                    String.format(
+                                            Mensagens.ERRO_IDENTIFICADOR_JA_DECLARADO,
+                                            idVar)
+                            );
+                        }
+                        if (varId.dimensao() != null && !varId.dimensao().exp_aritmetica().isEmpty()) {
+                            ;
+                            campos.put(idVar, new TiposLA.Arranjo(tipoVar));
+                        } else {
+                            campos.put(idVar, tipoVar);
+                        }
+                    }
+                }
+                escopos.obterEscopoAtual()
+                        .adicionar(ctx.IDENT().getText(), new TiposLA.Registro(campos));
             }
-            // TODO:
-//            visitTipo(ctx.tipo());
         }
-        return super.visitDeclaracao_local(ctx);
+        return null;
     }
 
     @Override
@@ -54,23 +93,43 @@ public class LASemantico extends LABaseVisitor<Void> {
         TipoLA tipo = LASemanticoUtils.verificarTipo(escopos, ctx.tipo());
 
         if (tipo == TiposLA.INVALIDO) {
+
             // TODO: Adicionar erro de tipo inválido
-            // Precisa sair?????
+            LASemanticoUtils.adicionarErroSemantico(
+                    ctx.tipo().start,
+                    String.format(Mensagens.ERRO_TIPO_NAO_DECLARADO, ctx.tipo().getText()));
         }
 
         for (var identificador : ctx.identificador()) {
-            TabelaDeSimbolos.EntradaTabelaDeSimbolos etds = escopos.verificar(identificador.getText());
-            if ( etds != null){
+            EntradaTabelaDeSimbolos etds = escopos.verificar(identificador.getText());
+            if (etds != null) {
                 // TODO: Adicionar erro de identificador já existe
-            } else if (tipo != TiposLA.INVALIDO) {
-                String id = identificador.IDENT().stream()
-                        .map(Object::toString).collect(Collectors.joining("."));
+                LASemanticoUtils.adicionarErroSemantico(identificador.IDENT(0).getSymbol(),
+                        String.format(
+                                Mensagens.ERRO_IDENTIFICADOR_JA_DECLARADO,
+                                identificador.getText()));
 
-                    escopos.obterEscopoAtual().adicionar(id, tipo, null);
+            }
+
+            String id = identificador.IDENT(0).getText();
+            var indices = identificador.dimensao().exp_aritmetica();
+
+            for (int i = indices.size() - 1; i >= 0; i--) {
+                var indice = indices.get(i);
+                TipoLA tipoIndice = LASemanticoUtils.verificarTipo(escopos, indice);
+                if (tipoIndice != TiposLA.INTEIRO) {
+                    tipo = TiposLA.INVALIDO;
+                } else {
+                    tipo = new TiposLA.Arranjo(tipo);
+                }
+            }
+
+            if (etds == null) {
+                escopos.obterEscopoAtual().adicionar(id, tipo);
             }
         }
 
-        return super.visitVariavel(ctx);
+        return null;
     }
 
     @Override
@@ -87,17 +146,17 @@ public class LASemantico extends LABaseVisitor<Void> {
             escopos.criarNovoEscopo(tipoRetorno);
         }
 
-        Map<String, TipoLA> tiposParametros = new HashMap<>();
+        List<TipoLA> tiposParametros = new ArrayList<>();
         // checar os parametros
-        for (var parametro: ctx.parametros().parametro()) {
+        for (var parametro : ctx.parametros().parametro()) {
             for (var pid : parametro.identificador()) {
                 String strPid = pid.getText();
-                if (tiposParametros.containsKey(strPid)) {
+                if (escopos.verificar(strPid) != null) {
                     // TODO: erro - nome de parametro já declarado
                 } else {
                     TipoLA tipoParametro = LASemanticoUtils.verificarTipo(escopos, parametro.tipo_estendido());
-                    tiposParametros.put(strPid, tipoParametro);
-                    escopos.obterEscopoAtual().adicionar(strPid, tipoParametro, null);
+                    tiposParametros.add(tipoParametro);
+                    escopos.obterEscopoAtual().adicionar(strPid, tipoParametro);
                 }
             }
         }
@@ -115,16 +174,10 @@ public class LASemantico extends LABaseVisitor<Void> {
         escopos.abandonarEscopo();
 
         // TODO: adicionar somente se sem erros
-        escopos.obterEscopoAtual().adicionar(identificador, tipo, null);
+        escopos.obterEscopoAtual().adicionar(identificador, tipo);
 
-        return super.visitDeclaracao_global(ctx);
+        return null;
     }
-
-    @Override
-    public Void visitCmdLeia(LAParser.CmdLeiaContext ctx) {
-        return super.visitCmdLeia(ctx);
-    }
-
 
     @Override
     public Void visitCmdSe(LAParser.CmdSeContext ctx) {
@@ -148,13 +201,12 @@ public class LASemantico extends LABaseVisitor<Void> {
 
         ctx.cmd().forEach(this::visitCmd);
 
-//        return super.visitCmdCaso(ctx);
         return null;
     }
 
     @Override
     public Void visitCmdPara(LAParser.CmdParaContext ctx) {
-        TabelaDeSimbolos.EntradaTabelaDeSimbolos etds = escopos.verificar(ctx.IDENT().getText());
+        EntradaTabelaDeSimbolos etds = escopos.verificar(ctx.IDENT().getText());
         if (etds == null) {
             // TODO: erro - variavel nao declarada
         } else if (etds.tipo != TiposLA.INTEIRO) {
@@ -163,31 +215,30 @@ public class LASemantico extends LABaseVisitor<Void> {
 
         ctx.cmd().forEach(this::visitCmd);
 
-//        return super.visitCmdPara(ctx);
         return null;
     }
 
     @Override
     public Void visitCmdEnquanto(LAParser.CmdEnquantoContext ctx) {
+        visitExpressao(ctx.expressao());
         TipoLA tipoExp = LASemanticoUtils.verificarTipo(escopos, ctx.expressao());
         if (tipoExp != TiposLA.LOGICO) {
             // TODO: Algum erro
         }
 
         ctx.cmd().forEach(this::visitCmd);
-//        return super.visitCmdEnquanto(ctx);
         return null;
     }
 
     @Override
     public Void visitCmdFaca(LAParser.CmdFacaContext ctx) {
+        visitExpressao(ctx.expressao());
         TipoLA tipoExp = LASemanticoUtils.verificarTipo(escopos, ctx.expressao());
         if (tipoExp != TiposLA.LOGICO) {
             // TODO: Algum erro
         }
 
         ctx.cmd().forEach(this::visitCmd);
-//        return super.visitCmdFaca(ctx);
         return null;
     }
 
@@ -197,9 +248,14 @@ public class LASemantico extends LABaseVisitor<Void> {
 
         if (tipoId == TiposLA.INVALIDO) {
             // TODO: variavel não declarada
-        } else if (ctx.start.getText().equals("^")) {
-            if (tipoId instanceof TiposLA.Endereco) {
-                tipoId = ((TiposLA.Endereco) tipoId).tipoConteudo;
+            LASemanticoUtils.adicionarErroSemantico(
+                    ctx.identificador().start,
+                    String.format(
+                            Mensagens.ERRO_IDENTIFICADOR_NAO_DECLARADO,
+                            ctx.identificador().getText()));
+        } else if (ctx.OP_PONTEIRO() != null) {
+            if (tipoId instanceof TiposLA.Ponteiro) {
+                tipoId = ((TiposLA.Ponteiro) tipoId).tipoConteudo;
             } else {
                 tipoId = TiposLA.INVALIDO;
             }
@@ -207,11 +263,15 @@ public class LASemantico extends LABaseVisitor<Void> {
 
         TipoLA tipoExp = LASemanticoUtils.verificarTipo(escopos, ctx.expressao());
 
-        if (tipoId != tipoExp) {
+        if (tipoId == TiposLA.REAL && tipoExp == TiposLA.INTEIRO) {
+            // ok
+        } else if (tipoId instanceof TiposLA.Ponteiro && tipoExp == TiposLA.ENDERECO) {
+
+        } else if (tipoId != tipoExp && tipoId != TiposLA.INVALIDO) {
+            // Não atribuir se a variavel não existe
             // TODO: erro - atribuicao incompativel
         }
 
-//        return super.visitCmdAtribuicao(ctx);
         return null;
     }
 
@@ -229,8 +289,27 @@ public class LASemantico extends LABaseVisitor<Void> {
 
     @Override
     public Void visitIdentificador(LAParser.IdentificadorContext ctx) {
-        TabelaDeSimbolos.EntradaTabelaDeSimbolos etds = escopos.verificar(ctx.getText());
-        if (etds == null) {
+        EntradaTabelaDeSimbolos etds = escopos.verificar(ctx.IDENT(0).getText());
+        TipoLA tipoId = TiposLA.INVALIDO;
+        if (etds != null) {
+            tipoId = etds.tipo;
+            if (tipoId instanceof TiposLA.Registro) {
+                for (int i = 1; i < ctx.IDENT().size(); i++) {
+                    var strId = ctx.IDENT(i).getText();
+                    if (!(tipoId instanceof TiposLA.Registro) ||
+                            !((TiposLA.Registro) tipoId).campos.containsKey(strId)) {
+                        tipoId = TiposLA.INVALIDO;
+                        break;
+                    }
+                    tipoId = ((TiposLA.Registro) tipoId).campos.get(strId);
+                }
+                if (tipoId == TiposLA.INVALIDO) {
+                    LASemanticoUtils.adicionarErroSemantico(
+                            ctx.start,
+                            String.format(Mensagens.ERRO_IDENTIFICADOR_NAO_DECLARADO, ctx.getText()));
+                }
+            }
+        } else {
             // TODO: erro - variavel não declarada
             // Talvez seja preciso diferenciar endereços
         }
@@ -238,4 +317,56 @@ public class LASemantico extends LABaseVisitor<Void> {
         return null;
     }
 
+    @Override
+    public Void visitCmdChamada(LAParser.CmdChamadaContext ctx) {
+        ctx.expressao().forEach(this::visitExpressao);
+        EntradaTabelaDeSimbolos etds = escopos.verificar(ctx.IDENT().getText());
+        if (etds == null) {
+            LASemanticoUtils.adicionarErroSemantico(
+                    ctx.start,
+                    String.format(
+                            Mensagens.ERRO_IDENTIFICADOR_NAO_DECLARADO,
+                            ctx.start.getText()));
+        } else {
+            List<TipoLA> params = new ArrayList<>();
+            if (etds.tipo instanceof TiposLA.Funcao) {
+                params = ((TiposLA.Funcao) etds.tipo).tipoParametros;
+            } else if (etds.tipo instanceof TiposLA.Procedimento) {
+                params = ((TiposLA.Procedimento) etds.tipo).parametros;
+            }
+
+            if (params.size() != ctx.expressao().size()) {
+                LASemanticoUtils.adicionarErroSemantico(
+                        ctx.start,
+                        String.format(
+                                Mensagens.ERRO_PARAMETROS_INCOMPATIVEIS,
+                                ctx.start.getText()));
+            } else {
+                for (int i = 0; i < ctx.expressao().size(); i++) {
+                    TipoLA tipoExp = LASemanticoUtils.verificarTipo(escopos, ctx.expressao(i));
+                    if (tipoExp != params.get(i)) {
+                        LASemanticoUtils.adicionarErroSemantico(
+                                ctx.start,
+                                String.format(
+                                        Mensagens.ERRO_PARAMETROS_INCOMPATIVEIS,
+                                        ctx.start.getText()));
+                        break;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Void visitParcela_unario(LAParser.Parcela_unarioContext ctx) {
+        if (ctx.IDENT() != null) {
+            LASemanticoUtils.verificarTipo(escopos, ctx);
+        } else if (ctx.expParam != null) {
+            visitExpressao(ctx.expParam);
+        } else if (ctx.identificador() != null) {
+            visitIdentificador(ctx.identificador());
+        }
+        return null;
+    }
 }

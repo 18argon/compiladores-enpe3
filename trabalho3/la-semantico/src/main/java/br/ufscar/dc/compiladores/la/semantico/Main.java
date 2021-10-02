@@ -38,6 +38,9 @@ public class Main {
             LAParser.ProgramaContext arvore = parser.programa();
             LASemantico las = new LASemantico();
             las.visitPrograma(arvore);
+
+            LASemanticoUtils.errosSemanticos.forEach(pw::println);
+            pw.println("Fim da compilacao");
 //            parser.addErrorListener(cel);
 
 //        } catch (ParseCancellationException e) {

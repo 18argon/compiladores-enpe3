@@ -4,16 +4,18 @@ import br.ufscar.dc.compiladores.la.semantico.TiposLA.TipoLA;
 import org.antlr.v4.runtime.Token;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LASemanticoUtils {
     public static List<String> errosSemanticos = new ArrayList<>();
 
     public static void adicionarErroSemantico(Token t, String mensagem) {
         int linha = t.getLine();
-        int coluna = t.getCharPositionInLine();
+//        int coluna = t.getCharPositionInLine();
         // TODO: fix error format
-        errosSemanticos.add(String.format("Erro %d:%d - %s", linha, coluna, mensagem));
+        errosSemanticos.add(String.format("Linha %d: %s", linha, mensagem));
     }
 
     public static TipoLA verificarTipo(LAParser.Tipo_basicoContext ctx) {
@@ -36,31 +38,82 @@ public class LASemanticoUtils {
         return ret;
     }
 
-
+    public static TipoLA verificarTipo(LAParser.Valor_constanteContext ctx) {
+        TipoLA ret;
+        if (ctx.CADEIA() != null) {
+            ret = TiposLA.LITERAL;
+        } else if (ctx.NUM_INT() != null) {
+            ret = TiposLA.INTEIRO;
+        } else if (ctx.NUM_REAL() != null) {
+            ret = TiposLA.REAL;
+        } else {
+            ret = TiposLA.LOGICO;
+        }
+        return ret;
+    }
 
     public static TipoLA verificarTipo(Escopos escopos, LAParser.TipoContext ctx) {
-        TipoLA ret = null;
-
+        TipoLA ret;
+        if (ctx.start.getText().equals("registro")) {
+            ret = verificarTipo(escopos, ctx.registro());
+        } else {
+            ret = verificarTipo(escopos, ctx.tipo_estendido());
+        }
 
         return ret;
     }
 
     public static TipoLA verificarTipo(Escopos escopos, LAParser.Tipo_estendidoContext ctx) {
-        TipoLA ret = null;
+        TipoLA ret = verificarTipo(escopos, ctx.tipo_basico_ident());
+
+        if (ctx.start.getText().equals("^")) {
+            ret = new TiposLA.Ponteiro(ret);
+        }
 
         return ret;
     }
 
+    private static TipoLA verificarTipo(Escopos escopos, LAParser.Tipo_basico_identContext ctx) {
+        TipoLA ret;
+        if (ctx.tipo_basico() != null) {
+            ret = verificarTipo(ctx.tipo_basico());
+        } else {
+            // TODO: checar se é um tipo
+            EntradaTabelaDeSimbolos etds = escopos.verificar(ctx.IDENT().getText());
+            ret = etds == null ? TiposLA.INVALIDO : etds.tipo;
+        }
+        return ret;
+    }
+
+    private static TipoLA verificarTipo(Escopos escopos, LAParser.RegistroContext ctx) {
+        Map<String, TipoLA> campos = new HashMap<>();
+        boolean temErro = false;
+        for (var variavel : ctx.variavel()) {
+            TipoLA tipoVar = verificarTipo(escopos, variavel.tipo());
+            for (var id : variavel.identificador()) {
+                String strId = id.getText();
+                if (campos.containsKey(strId)) {
+                    // TODO: erro - identificador ja declarado
+                    temErro = true;
+                } else {
+                    campos.put(strId, tipoVar);
+                }
+            }
+        }
+        return temErro ? TiposLA.INVALIDO : new TiposLA.Registro(campos);
+    }
+
     public static TipoLA verificarTipo(Escopos escopos, LAParser.IdentificadorContext ctx) {
         TipoLA ret = TiposLA.INVALIDO;
-        TabelaDeSimbolos.EntradaTabelaDeSimbolos etds = escopos.verificar(ctx.id1.getText());
+        EntradaTabelaDeSimbolos etds = escopos.verificar(ctx.id1.getText());
+
         if (etds != null) {
             ret = etds.tipo;
 
             for (var id : ctx.outrosIds) {
                 if (ret instanceof TiposLA.Registro) {
                     ret = ((TiposLA.Registro) ret).campos.get(id.getText());
-                    if (ret != null) {
+                    if (ret == null) {
                         ret = TiposLA.INVALIDO;
                     }
                 } else {
@@ -68,7 +121,7 @@ public class LASemanticoUtils {
                 }
             }
             if (ctx.dimensao() != null) {
-                for(var exp: ctx.dimensao().exp_aritmetica()) {
+                for (var exp : ctx.dimensao().exp_aritmetica()) {
                     TipoLA tipoIndice = verificarTipo(escopos, exp);
                     if (tipoIndice != TiposLA.INTEIRO) {
                         ret = TiposLA.INVALIDO;
@@ -85,15 +138,17 @@ public class LASemanticoUtils {
     public static TipoLA verificarTipo(Escopos escopos, LAParser.ExpressaoContext ctx) {
         TipoLA ret = verificarTipo(escopos, ctx.termo1);
 
-        if(ctx.outrosTermos.size() != 0 && ret != TiposLA.LOGICO) {
-            ret = TiposLA.INVALIDO;
-        } else {
+
+        if (ret == TiposLA.LOGICO) {
             for (var termo : ctx.outrosTermos) {
                 TipoLA tipoTermo = verificarTipo(escopos, termo);
                 if (tipoTermo != TiposLA.LOGICO) {
                     ret = TiposLA.INVALIDO;
+                    break;
                 }
             }
+        } else if (!ctx.outrosTermos.isEmpty()) {
+            ret = TiposLA.INVALIDO;
         }
         return ret;
     }
@@ -101,17 +156,18 @@ public class LASemanticoUtils {
     private static TipoLA verificarTipo(Escopos escopos, LAParser.Termo_logicoContext ctx) {
         TipoLA ret = verificarTipo(escopos, ctx.fator1);
 
-        if(ctx.outrosFatores.size() != 0 && ret != TiposLA.LOGICO) {
-            ret = TiposLA.INVALIDO;
-        } else {
+        if (ret == TiposLA.LOGICO) {
             for (var fator : ctx.outrosFatores) {
                 TipoLA tipoFator = verificarTipo(escopos, fator);
                 if (tipoFator != TiposLA.LOGICO) {
                     ret = TiposLA.INVALIDO;
+                    break;
                 }
             }
+        } else if (!ctx.outrosFatores.isEmpty()) {
+            ret = TiposLA.INVALIDO;
         }
-        return null;
+        return ret;
     }
 
     private static TipoLA verificarTipo(Escopos escopos, LAParser.Fator_logicoContext ctx) {
@@ -141,25 +197,17 @@ public class LASemanticoUtils {
             TipoLA tipoExp2 = verificarTipo(escopos, ctx.exp2);
             if (ret == TiposLA.REAL && (tipoExp2 == TiposLA.REAL || tipoExp2 == TiposLA.INTEIRO)) {
                 ret = TiposLA.LOGICO;
-            } else if (ret == TiposLA.INTEIRO) {
-                if (tipoExp2 == TiposLA.INTEIRO) {
-                    ret = TiposLA.LOGICO;
-                } else if (tipoExp2 == TiposLA.REAL) {
-                    ret = TiposLA.LOGICO;
-                } else {
-                    ret = TiposLA.INVALIDO;
-                }
+            } else if (ret == TiposLA.INTEIRO && (tipoExp2 == TiposLA.REAL || tipoExp2 == TiposLA.INTEIRO)) {
+                ret = TiposLA.LOGICO;
             } else if (ret == TiposLA.LITERAL && ret == tipoExp2) {
                 ret = TiposLA.LOGICO;
-            } else if (ret instanceof TiposLA.Endereco || ret == TiposLA.LOGICO) {
-                String op = ctx.OP_RELACIONAL().getText();
-                if (ret != tipoExp2 && (!op.equals("=") && !op.equals("<>"))) {
-                    ret = TiposLA.INVALIDO;
-                } else {
+            } else if (ret instanceof TiposLA.Ponteiro || ret == TiposLA.LOGICO) {
+                String op = ctx.op_relacional().getText();
+                if (ret == tipoExp2 && (op.equals("=") || op.equals("<>"))) {
                     ret = TiposLA.LOGICO;
+                } else {
+                    ret = TiposLA.INVALIDO;
                 }
-            } else if (ret == tipoExp2) {
-                ret = TiposLA.LOGICO;
             } else {
                 ret = TiposLA.INVALIDO;
             }
@@ -171,17 +219,29 @@ public class LASemanticoUtils {
     public static TipoLA verificarTipo(Escopos escopos, LAParser.Exp_aritmeticaContext ctx) {
         TipoLA ret = verificarTipo(escopos, ctx.termo1);
 
-        if(ctx.outrosTermos.size() != 0 && (ret != TiposLA.INTEIRO && ret != TiposLA.REAL)) {
-            ret = TiposLA.INVALIDO;
-        } else {
+        if (ret == TiposLA.LITERAL) {
+            for (int i = 0; i < ctx.outrosTermos.size(); i++) {
+                String op = ctx.OP_ARITIMETICO1(i).getText();
+                TipoLA tipoTermo = verificarTipo(escopos, ctx.outrosTermos.get(i));
+                if (!op.equals("+") || ret != tipoTermo) {
+                    ret = TiposLA.INVALIDO;
+                    break;
+                }
+
+            }
+        } else if (ret == TiposLA.INTEIRO || ret == TiposLA.REAL) {
             for (var termo : ctx.outrosTermos) {
                 TipoLA tipoTermo = verificarTipo(escopos, termo);
-                if (tipoTermo != TiposLA.INTEIRO && tipoTermo != TiposLA.REAL) {
-                    ret = TiposLA.INVALIDO;
-                } else if (tipoTermo == TiposLA.REAL) {
+                if (ret == TiposLA.REAL && tipoTermo == TiposLA.INTEIRO ||
+                        ret == TiposLA.INTEIRO && tipoTermo == TiposLA.REAL) {
                     ret = TiposLA.REAL;
+                } else if (ret != tipoTermo) {
+                    ret = TiposLA.INVALIDO;
+                    break;
                 }
             }
+        } else if (!ctx.outrosTermos.isEmpty()) {
+            ret = TiposLA.INVALIDO;
         }
 
         return ret;
@@ -190,34 +250,38 @@ public class LASemanticoUtils {
     private static TipoLA verificarTipo(Escopos escopos, LAParser.TermoContext ctx) {
         TipoLA ret = verificarTipo(escopos, ctx.fator1);
 
-        if(ctx.outrosFatores.size() != 0 && (ret != TiposLA.INTEIRO && ret != TiposLA.REAL)) {
-            ret = TiposLA.INVALIDO;
-        } else {
+        if (ret == TiposLA.INTEIRO || ret == TiposLA.REAL) {
             for (var fator : ctx.outrosFatores) {
                 TipoLA tipoFator = verificarTipo(escopos, fator);
                 if (tipoFator != TiposLA.INTEIRO && tipoFator != TiposLA.REAL) {
                     ret = TiposLA.INVALIDO;
+                    break;
                 } else if (tipoFator == TiposLA.REAL) {
                     ret = TiposLA.REAL;
                 }
             }
+        } else if (!ctx.outrosFatores.isEmpty()) {
+            ret = TiposLA.INVALIDO;
         }
+
         return ret;
     }
 
     private static TipoLA verificarTipo(Escopos escopos, LAParser.FatorContext ctx) {
         TipoLA ret = verificarTipo(escopos, ctx.parcela1);
 
-        if(ctx.outrasParcelas.size() != 0 && ret != TiposLA.INTEIRO) {
-            ret = TiposLA.INVALIDO;
-        } else {
+        if (ret == TiposLA.INTEIRO) {
             for (var parcela : ctx.outrasParcelas) {
                 TipoLA tipoParcela = verificarTipo(escopos, parcela);
                 if (tipoParcela != TiposLA.INTEIRO) {
                     ret = TiposLA.INVALIDO;
+                    break;
                 }
             }
+        } else if (!ctx.outrasParcelas.isEmpty()) {
+            ret = TiposLA.INVALIDO;
         }
+
         return ret;
     }
 
@@ -225,7 +289,7 @@ public class LASemanticoUtils {
         TipoLA ret;
         if (ctx.parcela_unario() != null) {
             ret = verificarTipo(escopos, ctx.parcela_unario());
-            if (ctx.op_unario() != null && (ret != TiposLA.INTEIRO && ret != TiposLA.REAL)) {
+            if (ctx.OP_UNARIO() != null && (ret != TiposLA.INTEIRO && ret != TiposLA.REAL)) {
                 ret = TiposLA.INVALIDO;
             }
         } else {
@@ -234,19 +298,42 @@ public class LASemanticoUtils {
         return ret;
     }
 
-    private static TipoLA verificarTipo(Escopos escopos, LAParser.Parcela_unarioContext ctx) {
+    public static TipoLA verificarTipo(Escopos escopos, LAParser.Parcela_unarioContext ctx) {
         TipoLA ret = TiposLA.INVALIDO;
         if (ctx.identificador() != null) {
             ret = verificarTipo(escopos, ctx.identificador());
-            if (ctx.start.getText().equals("^")) {
-                if (ret instanceof TiposLA.Endereco) {
-                    ret = ((TiposLA.Endereco) ret).tipoConteudo;
+            if (ctx.OP_PONTEIRO() != null) {
+                if (ret instanceof TiposLA.Ponteiro) {
+                    ret = ((TiposLA.Ponteiro) ret).tipoConteudo;
                 } else {
                     ret = TiposLA.INVALIDO;
                 }
             }
         } else if (ctx.IDENT() != null) {
-            // TODO: verificar chamada de função ou procedimento
+            EntradaTabelaDeSimbolos etds = escopos.verificar(ctx.IDENT().getText());
+            if (etds != null && etds.tipo instanceof TiposLA.Funcao) {
+                ret = etds.tipo;
+                if (ctx.args.size() == ((TiposLA.Funcao) ret).tipoParametros.size()) {
+                    for (int i = 0; i < ctx.args.size(); i++) {
+                        TipoLA tipoExp = verificarTipo(escopos, ctx.expressao(i));
+                        if (tipoExp != ((TiposLA.Funcao) ret).tipoParametros.get(i)) {
+                            ret = TiposLA.INVALIDO;
+                            break;
+                        }
+                    }
+                } else {
+                    ret = TiposLA.INVALIDO;
+                }
+                if (ret != TiposLA.INVALIDO) {
+                    ret = ((TiposLA.Funcao) ret).tipoRetorno;
+                } else {
+                    LASemanticoUtils.adicionarErroSemantico(
+                            ctx.IDENT().getSymbol(),
+                            String.format(
+                                    Mensagens.ERRO_PARAMETROS_INCOMPATIVEIS,
+                                    ctx.IDENT().getText()));
+                }
+            }
         } else if (ctx.NUM_INT() != null) {
             ret = TiposLA.INTEIRO;
         } else if (ctx.NUM_REAL() != null) {
@@ -264,7 +351,8 @@ public class LASemanticoUtils {
         } else {
             ret = verificarTipo(escopos, ctx.identificador());
             if (ret != TiposLA.INVALIDO) {
-                ret = new TiposLA.Endereco(ret);
+                // TODO: Fazer tipo endereço ter um tipo
+                ret = TiposLA.ENDERECO;
             }
         }
         return ret;

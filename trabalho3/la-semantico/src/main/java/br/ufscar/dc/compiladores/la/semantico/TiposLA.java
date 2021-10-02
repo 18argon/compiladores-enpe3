@@ -1,5 +1,6 @@
 package br.ufscar.dc.compiladores.la.semantico;
 
+import java.util.List;
 import java.util.Map;
 
 public class TiposLA {
@@ -23,29 +24,29 @@ public class TiposLA {
 
     static final TipoLA ENDERECO = new TipoLA("endereco");
 
-    static class Endereco extends TipoLA {
+    static class Ponteiro extends TipoLA {
         TipoLA tipoConteudo;
 
-        public Endereco(TipoLA tipo) {
-            super("endereco");
+        public Ponteiro(TipoLA tipo) {
+            super("ponteiro");
             this.tipoConteudo = tipo;
         }
     }
 
     static class Procedimento extends TipoLA {
-        Map<String, TipoLA> parametros;
+        List<TipoLA> parametros;
 
-        public Procedimento(Map<String, TipoLA> parametros) {
+        public Procedimento(List<TipoLA> parametros) {
             super("procedimento");
             this.parametros = parametros;
         }
     }
 
     static class Funcao extends TipoLA {
-        Map<String, TipoLA> tipoParametros;
+        List<TipoLA> tipoParametros;
         TipoLA tipoRetorno;
 
-        public Funcao(Map<String, TipoLA> tipoParametros, TipoLA tipoRetorno) {
+        public Funcao(List<TipoLA> tipoParametros, TipoLA tipoRetorno) {
             super("funcao");
             this.tipoParametros = tipoParametros;
             this.tipoRetorno = tipoRetorno;
@@ -62,12 +63,10 @@ public class TiposLA {
     }
 
     static class Arranjo extends TipoLA {
-        int tamanho;
         TipoLA tipo;
 
-        public Arranjo(int tamanho, TipoLA tipo) {
+        public Arranjo(TipoLA tipo) {
             super("arranjo");
-            this.tamanho = tamanho;
             this.tipo = tipo;
         }
     }
