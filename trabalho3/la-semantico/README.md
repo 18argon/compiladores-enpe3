@@ -42,5 +42,5 @@ Exemplo:
 java -jar "$PWD/corretor.jar" "java -jar $PWD/la-semantico.jar" gcc "$PWD/tmp/" "$PWD/casos-de-teste/" "760648, 795314" semantico
 ```
 
-O programa executará todos os casos de teste do analisador sintático e apresentará o resultado no final.
+O programa executará todos os casos de teste do analisador semântico e apresentará o resultado no final.
 As saídas para cada um dos testes está no diretório de saída informado no comando executado.

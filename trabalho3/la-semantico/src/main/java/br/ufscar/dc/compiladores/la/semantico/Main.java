@@ -39,8 +39,15 @@ public class Main {
             LASemantico las = new LASemantico();
             las.visitPrograma(arvore);
 
-            LASemanticoUtils.errosSemanticos.forEach(pw::println);
-            pw.println("Fim da compilacao");
+            if (!LASemanticoUtils.errosSemanticos.isEmpty()) {
+                LASemanticoUtils.errosSemanticos.forEach(pw::println);
+                pw.println("Fim da compilacao");
+            } else {
+                GeradorC gc = new GeradorC();
+                gc.visitPrograma(arvore);
+                pw.write(gc.saida.toString());
+            }
+
 //            parser.addErrorListener(cel);
 
 //        } catch (ParseCancellationException e) {
