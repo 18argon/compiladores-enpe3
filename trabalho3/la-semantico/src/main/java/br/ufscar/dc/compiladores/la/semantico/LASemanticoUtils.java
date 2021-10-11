@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+//Classe responsável por fazer a verficação dos tipos de estruturas, variáveis e comandos da gramática
 public class LASemanticoUtils {
     public static List<String> errosSemanticos = new ArrayList<>();
 

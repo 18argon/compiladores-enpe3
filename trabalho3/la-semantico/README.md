@@ -43,4 +43,5 @@ java -jar "$PWD/corretor.jar" "java -jar $PWD/la-semantico.jar" gcc "$PWD/tmp/" 
 ```
 
 O programa executará todos os casos de teste do analisador semântico e apresentará o resultado no final.
+O programa executará todos os casos de teste e gerará os códigos em linguagem C.
 As saídas para cada um dos testes está no diretório de saída informado no comando executado.

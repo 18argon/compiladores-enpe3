@@ -1,5 +1,5 @@
 grammar LA;
-
+//Gramatica da linguagem LA
 programa
     : declaracoes 'algoritmo' corpo 'fim_algoritmo'
     ;
@@ -79,7 +79,7 @@ parametros
 corpo
     : declaracao_local* cmd*
     ;
-
+//Comandos existentes na linguagem LA
 cmd
     : cmdLeia
     | cmdEscreva
@@ -149,7 +149,7 @@ numero_intervalo
     : OP_UNARIO? NUM_INT ('..' OP_UNARIO? NUM_INT)?
     ;
 
-
+//Expressao aritmetica
 exp_aritmetica
     : termo1=termo (OP_ARITIMETICO1 outrosTermos+=termo)*
     ;
@@ -178,8 +178,10 @@ parcela_unario
 
 parcela_nao_unario
     : OP_ENDERECO identificador
-    | CADEIA;
+    | CADEIA
+    ;
 
+//Expressao relacional
 exp_relacional
     : exp1=exp_aritmetica (op_relacional exp2=exp_aritmetica)?
     ;
@@ -202,6 +204,7 @@ parcela_logica
     | ('verdadeiro' | 'falso')
     ;
 
+//operadores aritimeticos
 OP_ARITIMETICO1
     : '+'
     | '-'
@@ -220,7 +223,7 @@ OP_ARITIMETICO3
     : '%'
     ;
 
-
+//operadores logicos
 OP_LOGICO1
     : 'ou'
     ;
@@ -229,6 +232,7 @@ OP_LOGICO2
     : 'e'
     ;
 
+//operadores relacionais
 op_relacional
     : '<>'
     | '='
@@ -237,11 +241,11 @@ op_relacional
     | '>='
     | '>'
     ;
-
+//Operador para ponteiro
 OP_PONTEIRO
     : '^'
     ;
-
+//operador para endereco
 OP_ENDERECO
     : '&'
     ;

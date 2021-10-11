@@ -2,6 +2,7 @@ package br.ufscar.dc.compiladores.la.semantico;
 
 import java.util.stream.Collectors;
 
+//Classe responsável por gerar em linguagem C os códigos da linguagem LA
 public class GeradorC extends LABaseVisitor<Void> {
     StringBuilder saida;
     Escopos escopos;
