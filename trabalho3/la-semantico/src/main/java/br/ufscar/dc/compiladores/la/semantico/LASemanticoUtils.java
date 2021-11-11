@@ -221,7 +221,7 @@ public class LASemanticoUtils {
 
         if (ret == TiposLA.LITERAL) {
             for (int i = 0; i < ctx.outrosTermos.size(); i++) {
-                String op = ctx.OP_ARITIMETICO1(i).getText();
+                String op = ctx.op.get(i).getText();
                 TipoLA tipoTermo = verificarTipo(escopos, ctx.outrosTermos.get(i));
                 if (!op.equals("+") || ret != tipoTermo) {
                     ret = TiposLA.INVALIDO;
@@ -289,7 +289,7 @@ public class LASemanticoUtils {
         TipoLA ret;
         if (ctx.parcela_unario() != null) {
             ret = verificarTipo(escopos, ctx.parcela_unario());
-            if (ctx.OP_UNARIO() != null && (ret != TiposLA.INTEIRO && ret != TiposLA.REAL)) {
+            if (ctx.op != null && (ret != TiposLA.INTEIRO && ret != TiposLA.REAL)) {
                 ret = TiposLA.INVALIDO;
             }
         } else {

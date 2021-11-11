@@ -22,18 +22,19 @@ public class Main {
         String arquivoSaida = args[1];
 
         try (PrintWriter pw = new PrintWriter(arquivoSaida)) {
-//            CustomErrorListener cel = new CustomErrorListener(pw);
+            CustomErrorListener cel = new CustomErrorListener(pw);
             CharStream cs = CharStreams.fromFileName(arquivoEntrada);
 
             LALexer lexer = new LALexer(cs);
             lexer.removeErrorListeners();
-//            lexer.addErrorListener(cel);
+            lexer.addErrorListener(cel);
 
             CommonTokenStream tokens = new CommonTokenStream(lexer);
 
 
             LAParser parser = new LAParser(tokens);
             parser.removeErrorListeners();
+            parser.addErrorListener(cel);
 
             LAParser.ProgramaContext arvore = parser.programa();
             LASemantico las = new LASemantico();
@@ -48,7 +49,6 @@ public class Main {
                 pw.write(gc.saida.toString());
             }
 
-//            parser.addErrorListener(cel);
 
 //        } catch (ParseCancellationException e) {
 //             Sair no primeiro erro

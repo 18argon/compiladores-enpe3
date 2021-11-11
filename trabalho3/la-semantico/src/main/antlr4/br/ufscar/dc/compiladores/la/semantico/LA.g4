@@ -102,7 +102,7 @@ cmdEscreva
     ;
 
 cmdSe
-    : 'se' expressao 'entao' cmd* ('senao' cmd*)? 'fim_se'
+    : 'se' expressao 'entao' cmdsEntao+=cmd* ('senao' cmdsSenao+=cmd*)? 'fim_se'
     ;
 
 cmdCaso
@@ -146,12 +146,12 @@ constantes
     ;
 
 numero_intervalo
-    : OP_UNARIO? NUM_INT ('..' OP_UNARIO? NUM_INT)?
+    : sinalInicio='-'? inicio=NUM_INT ('..' sinalFim='-'? fim=NUM_INT)?
     ;
 
 
 exp_aritmetica
-    : termo1=termo (OP_ARITIMETICO1 outrosTermos+=termo)*
+    : termo1=termo (op+=('+'|'-') outrosTermos+=termo)*
     ;
 
 termo
@@ -164,7 +164,7 @@ fator
 
 
 parcela
-    : OP_UNARIO? parcela_unario
+    : op='-'? parcela_unario
     | parcela_nao_unario
     ;
 
@@ -202,19 +202,11 @@ parcela_logica
     | ('verdadeiro' | 'falso')
     ;
 
-OP_ARITIMETICO1
-    : '+'
-    | '-'
-    ;
-
 OP_ARITIMETICO2
     : '*'
     | '/'
     ;
 
-OP_UNARIO
-    : '-'
-    ;
 
 OP_ARITIMETICO3
     : '%'
@@ -269,7 +261,7 @@ CADEIA
 //Sequência de escape para aspas duplas
 fragment
 ESC_SEQ
-    : '\\"'
+    : '\\"' | '\\'
     ;
 
 //Espaços em branco: pular linha, tabulação
