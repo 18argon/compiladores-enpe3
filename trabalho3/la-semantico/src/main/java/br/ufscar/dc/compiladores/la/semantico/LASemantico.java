@@ -59,7 +59,7 @@ public class LASemantico extends LABaseVisitor<Void> {
             }
 
             if (ctx.tipo().start.getText().equals("registro")) {
-                // verificaç
+                // verificação da declaração de registro
                 Map<String, TipoLA> campos = new HashMap<>();
                 for (var variavel : ctx.tipo().registro().variavel()) {
                     TipoLA tipoVar = LASemanticoUtils.verificarTipo(escopos, variavel.tipo());
@@ -76,7 +76,6 @@ public class LASemantico extends LABaseVisitor<Void> {
                             );
                         }
                         if (varId.dimensao() != null && !varId.dimensao().exp_aritmetica().isEmpty()) {
-                            ;
                             campos.put(idVar, new TiposLA.Arranjo(tipoVar));
                         } else {
                             campos.put(idVar, tipoVar);

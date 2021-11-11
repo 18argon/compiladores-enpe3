@@ -2,7 +2,6 @@ package br.ufscar.dc.compiladores.la.semantico;
 
 import java.util.LinkedList;
 
-//Classe responsável por gerar as tabelas de símbolo para cada escopo
 public class Escopos {
     static class Escopo {
         TabelaDeSimbolos tabela;

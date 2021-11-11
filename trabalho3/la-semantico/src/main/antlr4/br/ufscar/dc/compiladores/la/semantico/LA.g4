@@ -1,5 +1,5 @@
 grammar LA;
-//Gramatica da linguagem LA
+
 programa
     : declaracoes 'algoritmo' corpo 'fim_algoritmo'
     ;
@@ -79,7 +79,7 @@ parametros
 corpo
     : declaracao_local* cmd*
     ;
-//Comandos existentes na linguagem LA
+
 cmd
     : cmdLeia
     | cmdEscreva
@@ -102,7 +102,7 @@ cmdEscreva
     ;
 
 cmdSe
-    : 'se' expressao 'entao' cmd* ('senao' cmd*)? 'fim_se'
+    : 'se' expressao 'entao' cmdsEntao+=cmd* ('senao' cmdsSenao+=cmd*)? 'fim_se'
     ;
 
 cmdCaso
@@ -146,12 +146,12 @@ constantes
     ;
 
 numero_intervalo
-    : OP_UNARIO? NUM_INT ('..' OP_UNARIO? NUM_INT)?
+    : sinalInicio='-'? inicio=NUM_INT ('..' sinalFim='-'? fim=NUM_INT)?
     ;
 
-//Expressao aritmetica
+
 exp_aritmetica
-    : termo1=termo (OP_ARITIMETICO1 outrosTermos+=termo)*
+    : termo1=termo (op+=('+'|'-') outrosTermos+=termo)*
     ;
 
 termo
@@ -164,7 +164,7 @@ fator
 
 
 parcela
-    : OP_UNARIO? parcela_unario
+    : op='-'? parcela_unario
     | parcela_nao_unario
     ;
 
@@ -178,10 +178,8 @@ parcela_unario
 
 parcela_nao_unario
     : OP_ENDERECO identificador
-    | CADEIA
-    ;
+    | CADEIA;
 
-//Expressao relacional
 exp_relacional
     : exp1=exp_aritmetica (op_relacional exp2=exp_aritmetica)?
     ;
@@ -204,26 +202,17 @@ parcela_logica
     | ('verdadeiro' | 'falso')
     ;
 
-//operadores aritimeticos
-OP_ARITIMETICO1
-    : '+'
-    | '-'
-    ;
-
 OP_ARITIMETICO2
     : '*'
     | '/'
     ;
 
-OP_UNARIO
-    : '-'
-    ;
 
 OP_ARITIMETICO3
     : '%'
     ;
 
-//operadores logicos
+
 OP_LOGICO1
     : 'ou'
     ;
@@ -232,7 +221,6 @@ OP_LOGICO2
     : 'e'
     ;
 
-//operadores relacionais
 op_relacional
     : '<>'
     | '='
@@ -241,11 +229,11 @@ op_relacional
     | '>='
     | '>'
     ;
-//Operador para ponteiro
+
 OP_PONTEIRO
     : '^'
     ;
-//operador para endereco
+
 OP_ENDERECO
     : '&'
     ;
@@ -273,7 +261,7 @@ CADEIA
 //Sequência de escape para aspas duplas
 fragment
 ESC_SEQ
-    : '\\"'
+    : '\\"' | '\\'
     ;
 
 //Espaços em branco: pular linha, tabulação
@@ -290,3 +278,4 @@ COMENTARIO
 DESCONHECIDO
     : .+?
     ;
+
