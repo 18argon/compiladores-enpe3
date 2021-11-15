@@ -1,0 +1,13 @@
+planner mensal{
+    inicio: terca-feira;
+    
+    Prova1{
+        data: 12/05
+        hora: 14:00
+    }
+    
+    Prova1{
+        data: 20/05
+        hora: 16:00
+    }
+}

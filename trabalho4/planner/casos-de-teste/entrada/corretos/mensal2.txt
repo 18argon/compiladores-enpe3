@@ -1,0 +1,10 @@
+/*tarefa que dure mais que um dia*/
+
+planner mensal{
+    inicio: quinta-feira;
+    tarefa1{
+        data inicio: 12/11 
+        data fim: 15/11
+        hora: 8:00
+    }
+}

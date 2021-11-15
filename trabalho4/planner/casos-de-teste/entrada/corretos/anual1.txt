@@ -1,0 +1,11 @@
+planner anual{
+    Inscricao{
+        data inicio: segunda-feira 15/01
+        hora: 15:00    
+    }
+    
+    Viagem{
+        data inicio: terca-feira 04/01
+        hora: 08:00
+    }
+}
