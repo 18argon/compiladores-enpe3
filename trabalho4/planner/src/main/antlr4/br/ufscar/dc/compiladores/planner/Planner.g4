@@ -3,7 +3,7 @@ grammar Planner;
 
 //Inicio do programa
 programa
-    : 'planner' formato
+    : 'planner' formato EOF
     ;
 
 //Tipos de planner
@@ -20,12 +20,20 @@ semanal
 
 //Planner mensal
 mensal
-    : 'mensal' '{' corpo_mensal '}'
+    : 'mensal' '{'  corpo_mensal '}'
     ;
 
 //Planner anual
 anual
-    : 'anual' '{' corpo_semanal '}'
+    : 'anual' '{' corpo_anual '}'
+    ;
+
+ano
+    : 'ano' ':' NUMERO
+    ;
+
+mes
+    : 'mes' ':' NUMERO'/'NUMERO
     ;
 
 //Corpo planner semanal
@@ -35,32 +43,41 @@ corpo_semanal
 
 //Corpo planner mensal
 corpo_mensal
-    : 'inicio' ':' dia_semana ';' tarefa+
+    : mes tarefa_mensal+
     ;
+
+//Corpo planner mensal
+corpo_anual
+    : ano tarefa_anual+
+    ;
+
 
 //Inicio tarefa semanal e anual
 tarefa_semanal
-    : TAREFA '{' data_semanal hora? descricao?'}'
+    : TAREFA '{' data_semanal descricao?'}'
     ;
 
 //Inicio tarefa
-tarefa
-    : TAREFA '{'data hora? descricao?'}'
+tarefa_mensal
+    : TAREFA '{' data_mensal descricao?'}'
+    ;
+
+//Inicio tarefa semanal e anual
+tarefa_anual
+    : TAREFA '{' data_anual descricao?'}'
     ;
 
 //Data da tarefa semanal
 data_semanal
-    : 'data' ('inicio')? ':' dia_semana (NUMERO'/'NUMERO)? ('data' 'fim' ':' dia_semana (NUMERO'/'NUMERO)?)?
+    : 'inicio' ':' dia_da_semana horario? ('fim' ':' dia_da_semana horario?)?
     ;
 
-//Data da tarefa mensal
-data
-    : 'data' ('inicio')? ':' dia_semana? NUMERO'/'NUMERO ('data' 'fim' ':' dia_semana? NUMERO'/'NUMERO)?
+data_mensal
+    : 'inicio' ':' dia horario? ('fim' ':' dia horario? )?
     ;
 
-//Horario da tarefa
-hora
-    : 'hora' ('inicio')? ':' NUMERO ':' NUMERO ('hora' 'fim' ':' NUMERO ':' NUMERO)?
+data_anual
+    : 'inicio' ':' dia_mes horario? ('fim' ':' dia_mes horario? )?
     ;
 
 //Descricao da tarefa
@@ -69,14 +86,61 @@ descricao
     ;
 
 //Opcoes para dias da semana
-dia_semana
+dia_da_semana
+    : DOMINGO
+    | SEGUNDA
+    | TERCA
+    | QUARTA
+    | QUINTA
+    | SEXTA
+    | SABADO
+    ;
+
+dia_mes : NUMERO'/'NUMERO;
+
+dia : NUMERO;
+
+horario: NUMERO':'NUMERO;
+
+
+DOMINGO
     : 'domingo'
-    | 'segunda-feira'
-    | 'terca-feira'
-    | 'quarta-feira'
-    | 'quinta-feira'
-    | 'sexta-feira'
-    | 'sabado'
+    | '1'
+    ;
+
+SEGUNDA
+    : 'segunda-feira'
+    | 'segunda'
+    | '2'
+    ;
+
+TERCA
+    : 'terca-feira'
+    | 'terca'
+    | '3'
+    ;
+
+QUARTA
+    : 'quarta-feira'
+    | 'quarta'
+    | '4'
+    ;
+
+QUINTA
+    : 'quinta-feira'
+    | 'quinta'
+    | '5'
+    ;
+
+SEXTA
+    : 'sexta-feira'
+    | 'sexta'
+    | '6'
+    ;
+
+SABADO
+    : 'sabado'
+    | '7'
     ;
 
 //Formato para descricao de tarefa
@@ -86,7 +150,7 @@ DESCRICAO
 
 //Nome tarefa
 TAREFA
-    : ('a'..'z' | 'A'..'Z') ('a'..'z'| 'A'..'Z' | '0'..'9')*
+    : ('a'..'z' | 'A'..'Z') ('a'..'z'| 'A'..'Z' | '0'..'9' | '-' | '_')*
     ;
 
 //Formato para dia

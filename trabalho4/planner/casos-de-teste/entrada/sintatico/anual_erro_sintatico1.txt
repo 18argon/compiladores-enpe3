@@ -1,10 +1,9 @@
-planner anual
-    
+planner anual {
+    ano: 2022
     aulas{
-        data inicio: quarta-feira 21/03
-        data fim: sabado 10/12        
+        inicio: 21/03
+        fim: 10/12
     }
-    
-}
+
 
 

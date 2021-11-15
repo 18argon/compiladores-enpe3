@@ -1,7 +1,7 @@
 planner semanal{
-    Estudo{
-        data inicio: terca-feira  
-        hora: 16:00
+    Estudo {
+        inicio: terca-feira 16:00
+        fim: sexta 16:00
         descricao: "entrega projeto"
     }
 }

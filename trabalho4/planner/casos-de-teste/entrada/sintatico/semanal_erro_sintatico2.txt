@@ -1,0 +1,10 @@
+semanal{
+    
+    Aula1{
+        inicio: segunda-feira 8:00
+    }
+    
+    Aula2{
+        inicio: terca-feira 10:00
+    }
+}

@@ -1,8 +1,0 @@
-/*revisar*/
-planner anual{
-    
-    Treino{
-        data: quarta-feira
-        hora: 15:00
-    }
-}d

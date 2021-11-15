@@ -1,12 +1,10 @@
 pla0ner semanal{
 
     natacao{
-        data: quinta-feira
-        hora: 17:00
+        inicio: quinta-feira 17:00
         
     prova{
-        data: sexta-feira
-        hora: 13:30
+        inicio: sexta-feira 13:30
     }
     
 }

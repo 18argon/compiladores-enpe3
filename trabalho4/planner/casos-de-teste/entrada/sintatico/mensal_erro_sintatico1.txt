@@ -1,9 +1,0 @@
-planner mensal{
-    inicio: segunda-feira
-    
-    Trabalho{
-        data: 23/05
-        hora: 23:59
-        descricao: "prazo final"
-    }
-}

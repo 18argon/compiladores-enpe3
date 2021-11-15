@@ -1,11 +1,15 @@
-planner anual{
+planner anual {
+    ano: 2022
     Inscricao{
-        data inicio: segunda-feira 15/01
-        hora: 15:00    
+        inicio: 15/01 15:00
     }
-    
+
+    Inscricao_Curso{
+        inicio: 15/01 15:00
+        fim: 16/01 16:00
+    }
+
     Viagem{
-        data inicio: terca-feira 04/01
-        hora: 08:00
+        inicio: 04/01 08:00
     }
 }

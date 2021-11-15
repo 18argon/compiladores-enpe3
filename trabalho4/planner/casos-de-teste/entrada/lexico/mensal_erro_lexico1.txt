@@ -1,8 +1,7 @@
 planner mensal{
-    iniio: segunda-feira; /*inicio do mes*/
+    ano: 11/2021; /*inicio do mes*/
     Leitura{
-        data inicio: sexta-feira 19/11
-        hora: 14:20
+        inicio: 19/11 14:20
         descricao: "livro de literatura"
     }
 }

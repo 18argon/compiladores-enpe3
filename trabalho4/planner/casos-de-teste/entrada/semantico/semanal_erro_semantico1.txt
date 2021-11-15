@@ -1,12 +1,7 @@
-semanal{
+planner semanal{
     
     Aula1{
-        data: segunda-feira
-        hora: 8:00
+        inicio: segunda-feira 25:30
     }
-    
-    Aula2{
-        data: terca-feira
-        hora: 10:00
-    }
+
 }

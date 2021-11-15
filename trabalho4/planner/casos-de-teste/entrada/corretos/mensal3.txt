@@ -1,12 +1,10 @@
 planner mensal{
-    inicio: terca-feira;
+    mes: 04/2022
     Questionario{
-        data: 17/4
-        hora: 14:00
+        inicio: 17 14:00
     }
     
     Trabalho{
-        data: 20/04
-        hora: 23:59
+        inicio: 20 23:59
     }
 }

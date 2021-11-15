@@ -1,13 +1,13 @@
 planner mensal{
-    inicio: terca-feira;
+    mes: 05/2021
     
-    Prova1{
-        data: 12/05
-        hora: 14:00
+    Trabalho1{
+        inicio: 23 23:59
+        descricao: "Trabalho 1 de POO"
     }
-    
-    Prova1{
-        data: 20/05
-        hora: 16:00
+
+    Trabalho1{
+        inicio: 27 23:59
+        descricao: "Trabalho 1 de Fisíca A"
     }
 }

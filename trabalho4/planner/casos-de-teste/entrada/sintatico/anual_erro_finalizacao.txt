@@ -1,0 +1,10 @@
+/*revisar*/
+planner anual{
+    ano: 2021
+    Treino{
+        inicio: 14/11 15:00
+    }
+}
+Basquete{
+    inicio: 21/11 16:00
+}
