@@ -1,5 +1,5 @@
 planner mensal{
-    ano: 11/2021; /*inicio do mes*/
+    mees: 11/2021 /*mes de referencia*/
     Leitura{
         inicio: 19/11 14:20
         descricao: "livro de literatura"
