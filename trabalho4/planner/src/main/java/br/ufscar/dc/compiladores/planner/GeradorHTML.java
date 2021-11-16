@@ -9,6 +9,11 @@ package br.ufscar.dc.compiladores.planner;
  *
  * @author vanessa
  */
-public class GeradorHTML {
-    
+public class GeradorHTML extends PlannerBaseVisitor<Void> {
+
+    StringBuilder saida;
+
+    public GeradorHTML() {
+        saida = new StringBuilder();
+    }
 }

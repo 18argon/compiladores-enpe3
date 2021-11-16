@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 import java.util.BitSet;
 
 //Classe responsável por customizar as mensagens de erro
-public class CustomErrorListener {
+public class CustomErrorListener  implements ANTLRErrorListener {
     
     //Variável para escrever no arquivo .txt
     PrintWriter pw;
@@ -18,8 +18,8 @@ public class CustomErrorListener {
         this.pw = pw;
     }
     
-    
-    public void syntaxeError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e){
+    @Override
+    public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e){
         Token t = (Token) offendingSymbol;
         String message;
         String tokenTypeName = PlannerLexer.VOCABULARY.getDisplayName(t.getType());
@@ -31,9 +31,7 @@ public class CustomErrorListener {
             //Erro devido ao não fechamento de comentário
             if (invalidChar.equals("/*")) {
                 message = "Linha " + line + ": comentario nao fechado";
-            }else if (invalidChar.equals("\"")) {      //Erro devido ao não fechamento de cadeia literal
-                message = "Linha " + line + ": cadeia descricao nao fechada"; 
-            }else {        //Erro devido ao não reconhecimento de símbolos
+            } else {        //Erro devido ao não reconhecimento de símbolos
                 message = "Linha " + line + ": " + t.getText() + " - simbolo nao identificado";
             }
         } else if (t.getType() == Token.EOF) {      //Erro devido à não finalização do algoritmo
@@ -49,4 +47,18 @@ public class CustomErrorListener {
     }
     
 
+    @Override
+    public void reportAmbiguity(Parser parser, DFA dfa, int i, int i1, boolean b, BitSet bitSet, ATNConfigSet atnConfigSet) {
+
+    }
+
+    @Override
+    public void reportAttemptingFullContext(Parser parser, DFA dfa, int i, int i1, BitSet bitSet, ATNConfigSet atnConfigSet) {
+
+    }
+
+    @Override
+    public void reportContextSensitivity(Parser parser, DFA dfa, int i, int i1, int i2, ATNConfigSet atnConfigSet) {
+
+    }
 }

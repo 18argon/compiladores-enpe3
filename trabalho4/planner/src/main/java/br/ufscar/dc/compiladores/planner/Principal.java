@@ -23,18 +23,19 @@ public class Principal {
         String arquivoSaida = args[1];
 
         try (PrintWriter pw = new PrintWriter(arquivoSaida)) {
-//            CustomErrorListener cel = new CustomErrorListener(pw);
+            CustomErrorListener cel = new CustomErrorListener(pw);
             CharStream cs = CharStreams.fromFileName(arquivoEntrada);
 
             PlannerLexer lexer = new PlannerLexer(cs);
-//            lexer.removeErrorListeners();
-//            lexer.addErrorListener(cel);
+            lexer.removeErrorListeners();
+            lexer.addErrorListener(cel);
 
             CommonTokenStream tokens = new CommonTokenStream(lexer);
 
 
             PlannerParser parser = new PlannerParser(tokens);
-//            parser.removeErrorListeners();
+            parser.removeErrorListeners();
+            parser.addErrorListener(cel);
 
             PlannerParser.ProgramaContext arvore = parser.programa();
             PlannerSemantico pls = new PlannerSemantico();
@@ -43,16 +44,14 @@ public class Principal {
             if (!PlannerSemanticoUtils.errosSemanticos.isEmpty()) {
                 PlannerSemanticoUtils.errosSemanticos.forEach(pw::println);
                 pw.println("Fim da compilacao");
-            } /*else {
-                GeradorC gc = new GeradorC();
-                gc.visitPrograma(arvore);
-                pw.write(gc.saida.toString());
-            }*/
+            } else {
+                GeradorHTML gh = new GeradorHTML();
+                gh.visitPrograma(arvore);
+                pw.write(gh.saida.toString());
+            }
 
-//            parser.addErrorListener(cel);
-
-//        } catch (ParseCancellationException e) {
-//             Sair no primeiro erro
+        } catch (ParseCancellationException e) {
+             // Sair no primeiro erro
         }
     }
     

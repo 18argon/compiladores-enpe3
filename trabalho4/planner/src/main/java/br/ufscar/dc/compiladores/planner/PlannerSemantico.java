@@ -1,66 +1,102 @@
 package br.ufscar.dc.compiladores.planner;
 
-//import br.ufscar.dc.compiladores.planner.TiposPlanner;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class PlannerSemantico extends PlannerBaseVisitor<Void>{
-    private final Escopos escopos;
-    
-    PlannerSemantico() {
-        escopos = new Escopos();
-    }
-    
-    @Override
-    public Void visitPrograma(PlannerParser.ProgramaContext ctx) {
-        escopos.init();
-        return super.visitPrograma(ctx);
-    }
-    
-    @Override
-    public Void visitFormato(PlannerParser.FormatoContext ctx){
-        String start = ctx.start.getText();
-       
-        if(start.equals("semanal")){
-            visitCorpo_semanal(ctx.semanal().corpo_semanal());
-           visitSemanal(ctx.semanal());
-        } else if(start.equals("mensal")){
-            visitCorpo_mensal(ctx.mensal().corpo_mensal());
-        } else if(start.equals("anual")){
-            visitCorpo_semanal(ctx.anual().corpo_semanal());
-        }
-        
-        return null;
+    TabelaDeSimbolos tds;
 
+    PlannerSemantico() {
+        tds = new TabelaDeSimbolos();
     }
     
     @Override
     public Void visitCorpo_semanal(PlannerParser.Corpo_semanalContext ctx){
-        
-        
-        
-        for(var tarefa_semanal : ctx.tarefa_semanal()){
-            EntradaTabelaDeSimbolos etds = escopos.verificar(tarefa_semanal.getText());
+        for(var tarefa : ctx.tarefa_semanal()){
+            EntradaTabelaDeSimbolos etds = tds.verificar(tarefa.TAREFA().getText());
             if(etds != null){
                  PlannerSemanticoUtils.adicionarErroSemantico(
-                    ctx.start,
+                    tarefa.TAREFA().getSymbol(),
                     String.format(
                             Mensagens.ERRO_TAREFA_JA_CRIADA,
-                            ctx.start.getText()));
+                            tarefa.TAREFA().getText()));
+            } else{
+                tds.adicionar(tarefa.TAREFA().getText());
             }
-            
-            else{
-        //        escopos.obterEscopoAtual().adicionar();
-            }
+            visitData_semanal(tarefa.data_semanal());
         }
         
         return null;
     }
-    
-    
-    
+
+    @Override
+    public Void visitCorpo_mensal(PlannerParser.Corpo_mensalContext ctx){
+        int mes = Integer.parseInt(ctx.campo_mes().mes.getText());
+        int ano = Integer.parseInt(ctx.campo_mes().ano.getText());
+
+        if (mes < 1 || 12 < mes) { //data incompativel
+            PlannerSemanticoUtils.adicionarErroSemantico(
+                    ctx.campo_mes().start,
+                    String.format(Mensagens.ERRO_DATA_INVALIDA, ctx.campo_mes().getText()));
+        }
+
+        for(var tarefa : ctx.tarefa_mensal()){
+            EntradaTabelaDeSimbolos etds = tds.verificar(tarefa.TAREFA().getText());
+            if(etds != null){
+                PlannerSemanticoUtils.adicionarErroSemantico(
+                        tarefa.TAREFA().getSymbol(),
+                        String.format(
+                                Mensagens.ERRO_TAREFA_JA_CRIADA,
+                                tarefa.TAREFA().getText()));
+            } else{
+                tds.adicionar(tarefa.TAREFA().getText());
+            }
+            visitData_mensal(tarefa.data_mensal());
+
+            PlannerSemanticoUtils.verificarDiaDoMes(ano, mes, tarefa.data_mensal().dia_inicio);
+            if (tarefa.data_mensal().dia_fim != null) {
+                PlannerSemanticoUtils.verificarDiaDoMes(ano, mes, tarefa.data_mensal().dia_fim);
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public Void visitCorpo_anual(PlannerParser.Corpo_anualContext ctx) {
+        int ano = Integer.parseInt(ctx.campo_ano().ano.getText());
+
+        for(var tarefa : ctx.tarefa_anual()){
+            EntradaTabelaDeSimbolos etds = tds.verificar(tarefa.TAREFA().getText());
+            if(etds != null){
+                PlannerSemanticoUtils.adicionarErroSemantico(
+                        tarefa.TAREFA().getSymbol(),
+                        String.format(
+                                Mensagens.ERRO_TAREFA_JA_CRIADA,
+                                tarefa.TAREFA().getText()));
+            } else{
+                tds.adicionar(tarefa.TAREFA().getText());
+            }
+            visitData_anual(tarefa.data_anual());
+
+            PlannerSemanticoUtils.verificarDiaMes(ano, tarefa.data_anual().dia_inicio);
+            if (tarefa.data_anual().dia_fim != null) {
+                PlannerSemanticoUtils.verificarDiaMes(ano, tarefa.data_anual().dia_fim);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Void visitHorario(PlannerParser.HorarioContext ctx) {
+        int hora = Integer.parseInt(ctx.hora.getText());
+        int minuto = Integer.parseInt(ctx.minuto.getText());
+        if (hora < 0 || 23 < hora || minuto < 0 || 59 < minuto) {//data invalida
+
+            PlannerSemanticoUtils.adicionarErroSemantico(
+                    ctx.start,
+                    String.format(Mensagens.ERRO_HORARIO_INVALIDO, ctx.getText()));
+        }
+
+        return null;
+    }
+
 }

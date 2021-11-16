@@ -28,14 +28,6 @@ anual
     : 'anual' '{' corpo_anual '}'
     ;
 
-ano
-    : 'ano' ':' NUMERO
-    ;
-
-mes
-    : 'mes' ':' NUMERO'/'NUMERO
-    ;
-
 //Corpo planner semanal
 corpo_semanal
     : tarefa_semanal+
@@ -43,103 +35,112 @@ corpo_semanal
 
 //Corpo planner mensal
 corpo_mensal
-    : mes tarefa_mensal+
+    : campo_mes tarefa_mensal+
     ;
 
-//Corpo planner mensal
+//Corpo planner anual
 corpo_anual
-    : ano tarefa_anual+
+    : campo_ano tarefa_anual+
     ;
 
-
-//Inicio tarefa semanal e anual
+//Formato tarefas
 tarefa_semanal
-    : TAREFA '{' data_semanal descricao?'}'
+    : TAREFA '{' data_semanal campo_descricao?'}'
     ;
 
-//Inicio tarefa
 tarefa_mensal
-    : TAREFA '{' data_mensal descricao?'}'
+    : TAREFA '{' data_mensal campo_descricao?'}'
     ;
 
-//Inicio tarefa semanal e anual
 tarefa_anual
-    : TAREFA '{' data_anual descricao?'}'
+    : TAREFA '{' data_anual campo_descricao?'}'
     ;
 
-//Data da tarefa semanal
+//Data das tarefas
 data_semanal
-    : 'inicio' ':' dia_da_semana horario? ('fim' ':' dia_da_semana horario?)?
+    : 'inicio' ':' dia_inicio=dia_da_semana horario_inicio=horario? ('fim' ':' dia_fim=dia_da_semana horario_fim=horario?)?
     ;
 
 data_mensal
-    : 'inicio' ':' dia horario? ('fim' ':' dia horario? )?
+    : 'inicio' ':' dia_inicio=dia_do_mes horario_inicio=horario? ('fim' ':' dia_fim=dia_do_mes horario_fim=horario? )?
     ;
 
 data_anual
-    : 'inicio' ':' dia_mes horario? ('fim' ':' dia_mes horario? )?
+    : 'inicio' ':' dia_inicio=dia_mes horario_inicio=horario? ('fim' ':' dia_fim=dia_mes horario_fim=horario? )?
+    ;
+
+//Ano de referencia
+campo_ano
+    : 'ano' ':' ano=NUMERO
+    ;
+//Mes e ano de referencia
+campo_mes
+    : 'mes' ':' mes=NUMERO'/'ano=NUMERO
     ;
 
 //Descricao da tarefa
-descricao
+campo_descricao
     : 'descricao' ':' DESCRICAO
     ;
 
 //Opcoes para dias da semana
 dia_da_semana
-    : DOMINGO
-    | SEGUNDA
+    : SEGUNDA
     | TERCA
     | QUARTA
     | QUINTA
     | SEXTA
     | SABADO
+    | DOMINGO
     ;
 
-dia_mes : NUMERO'/'NUMERO;
+//Formatos para dia do mes tarefa anual
+dia_mes : dia=NUMERO'/'mes=NUMERO;
 
-dia : NUMERO;
+//Dia do mes tarefa mensal
+dia_do_mes : dia=NUMERO;
 
-horario: NUMERO':'NUMERO;
+//Formato horario
+horario: hora=NUMERO':'minuto=NUMERO;
 
-
-DOMINGO
-    : 'domingo'
-    | '1'
-    ;
-
+//Formatos aceitos para dias da semana
 SEGUNDA
     : 'segunda-feira'
     | 'segunda'
-    | '2'
+    | '1'
     ;
 
 TERCA
     : 'terca-feira'
     | 'terca'
-    | '3'
+    | '2'
     ;
 
 QUARTA
     : 'quarta-feira'
     | 'quarta'
-    | '4'
+    | '3'
     ;
 
 QUINTA
     : 'quinta-feira'
     | 'quinta'
-    | '5'
+    | '4'
     ;
 
 SEXTA
     : 'sexta-feira'
     | 'sexta'
-    | '6'
+    | '5'
     ;
 
 SABADO
     : 'sabado'
+    | '6'
+    ;
+
+DOMINGO
+    : 'domingo'
     | '7'
     ;
 
