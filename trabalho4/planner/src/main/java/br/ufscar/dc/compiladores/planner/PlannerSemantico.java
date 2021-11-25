@@ -2,10 +2,10 @@ package br.ufscar.dc.compiladores.planner;
 
 
 public class PlannerSemantico extends PlannerBaseVisitor<Void>{
-    TabelaDeSimbolos tds;
+    TabelaDeSimbolos<EntradaTabelaDeSimbolos> tds;
 
     PlannerSemantico() {
-        tds = new TabelaDeSimbolos();
+        tds = new TabelaDeSimbolos<>();
     }
     
     @Override
@@ -19,7 +19,8 @@ public class PlannerSemantico extends PlannerBaseVisitor<Void>{
                             Mensagens.ERRO_TAREFA_JA_CRIADA,
                             tarefa.TAREFA().getText()));
             } else{
-                tds.adicionar(tarefa.TAREFA().getText());
+                String nomeTarefa = tarefa.TAREFA().getText();
+                tds.adicionar(nomeTarefa, new EntradaTabelaDeSimbolos(nomeTarefa));
             }
             visitData_semanal(tarefa.data_semanal());
         }
@@ -47,7 +48,8 @@ public class PlannerSemantico extends PlannerBaseVisitor<Void>{
                                 Mensagens.ERRO_TAREFA_JA_CRIADA,
                                 tarefa.TAREFA().getText()));
             } else{
-                tds.adicionar(tarefa.TAREFA().getText());
+                String nomeTarefa = tarefa.TAREFA().getText();
+                tds.adicionar(nomeTarefa, new EntradaTabelaDeSimbolos(nomeTarefa));
             }
             visitData_mensal(tarefa.data_mensal());
 
@@ -73,7 +75,8 @@ public class PlannerSemantico extends PlannerBaseVisitor<Void>{
                                 Mensagens.ERRO_TAREFA_JA_CRIADA,
                                 tarefa.TAREFA().getText()));
             } else{
-                tds.adicionar(tarefa.TAREFA().getText());
+                String nomeTarefa = tarefa.TAREFA().getText();
+                tds.adicionar(nomeTarefa, new EntradaTabelaDeSimbolos(nomeTarefa));
             }
             visitData_anual(tarefa.data_anual());
 

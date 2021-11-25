@@ -6,22 +6,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class TabelaDeSimbolos {
-    private final Map<String, EntradaTabelaDeSimbolos> tabela;
+public class TabelaDeSimbolos<T> {
+    private final Map<String, T> tabela;
 
     public TabelaDeSimbolos() {
         this.tabela = new HashMap<>();
     }
 
-    public void adicionar(String nome) {
-        tabela.put(nome, new EntradaTabelaDeSimbolos(nome));
+    public void adicionar(String nome, T etds) {
+        tabela.put(nome, etds);
     }
 
     public boolean existe(String nome) {
         return tabela.containsKey(nome);
     }
 
-    public EntradaTabelaDeSimbolos verificar(String nome) {
+    public T verificar(String nome) {
         return tabela.get(nome);
     }
 }
