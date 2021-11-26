@@ -53,10 +53,7 @@ public class PlannerSemantico extends PlannerBaseVisitor<Void>{
             }
             visitData_mensal(tarefa.data_mensal());
 
-            PlannerSemanticoUtils.verificarDiaDoMes(ano, mes, tarefa.data_mensal().dia_inicio);
-            if (tarefa.data_mensal().dia_fim != null) {
-                PlannerSemanticoUtils.verificarDiaDoMes(ano, mes, tarefa.data_mensal().dia_fim);
-            }
+            PlannerSemanticoUtils.verificarIntervalo(ano, mes, tarefa.data_mensal());
         }
 
         return null;
@@ -80,11 +77,7 @@ public class PlannerSemantico extends PlannerBaseVisitor<Void>{
             }
             visitData_anual(tarefa.data_anual());
 
-            PlannerSemanticoUtils.verificarDiaMes(ano, tarefa.data_anual().dia_inicio);
-            if (tarefa.data_anual().dia_fim != null) {
-                PlannerSemanticoUtils.verificarDiaMes(ano, tarefa.data_anual().dia_fim);
-                PlannerSemanticoUtils.verificarIntervalo(ano, tarefa.data_anual());
-            }
+            PlannerSemanticoUtils.verificarIntervalo(ano, tarefa.data_anual());
         }
         return null;
     }

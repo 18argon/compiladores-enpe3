@@ -17,27 +17,37 @@ public class PlannerSemanticoUtils {
         errosSemanticos.add(String.format("Linha %d:%d - %s", linha, coluna, mensagem));
     }
 
-    public static void verificarDiaDoMes(int ano, int mes, PlannerParser.Dia_do_mesContext ctx) {
+    private static boolean verificarDiaDoMes(int ano, int mes, PlannerParser.Dia_do_mesContext ctx) {
         int dia = Integer.parseInt(ctx.dia.getText());
         int diasNoMes = YearMonth.of(ano, mes).lengthOfMonth();
         if (dia < 1 || diasNoMes < dia) { //data incorreta
-            // todo: erro
             PlannerSemanticoUtils.adicionarErroSemantico(ctx.start,
                     String.format(Mensagens.ERRO_DATA_INVALIDA, ctx.start.getText()));
+            return false;
         }
+        return true;
     }
 
-    public static void verificarDiaMes(int ano, PlannerParser.Dia_mesContext ctx) {
+    private static boolean verificarDiaMes(int ano, PlannerParser.Dia_mesContext ctx) {
         int dia = Integer.parseInt(ctx.dia.getText());
         int mes = Integer.parseInt(ctx.mes.getText());
         int diasNoMes = YearMonth.of(ano, mes).lengthOfMonth();
         if (dia < 1 || diasNoMes < dia) { //data incorreta
             PlannerSemanticoUtils.adicionarErroSemantico(ctx.start,
                     String.format(Mensagens.ERRO_DATA_INVALIDA, ctx.start.getText()));
+            return false;
         }
+        return true;
     }
 
     public static void verificarIntervalo(int ano, PlannerParser.Data_anualContext ctx) {
+        boolean datasCorretas = verificarDiaMes(ano, ctx.dia_inicio);
+        if (ctx.dia_fim != null) {
+            datasCorretas = verificarDiaMes(ano, ctx.dia_fim) && datasCorretas;
+        }
+        if (!datasCorretas) {
+            return;
+        }
         Calendar inicio = parseData(ano, ctx.dia_inicio, ctx.horario_inicio);
         if (ctx.dia_fim != null) { //verifica apenas se dia_fim existir
             Calendar fim = parseData(ano, ctx.dia_fim, ctx.horario_fim);
@@ -52,11 +62,17 @@ public class PlannerSemanticoUtils {
     }
 
     public static void verificarIntervalo(int ano, int mes, PlannerParser.Data_mensalContext ctx) {
+        boolean datasCorretas = verificarDiaDoMes(ano, mes, ctx.dia_inicio);
+        if (ctx.dia_fim != null) {
+            datasCorretas = verificarDiaDoMes(ano, mes, ctx.dia_fim) && datasCorretas;
+        }
+        if (!datasCorretas) {
+            return;
+        }
         Calendar inicio = parseData(ano, mes, ctx.dia_inicio, ctx.horario_inicio);
         if (ctx.dia_fim != null) {
             Calendar fim = parseData(ano, mes, ctx.dia_fim, ctx.horario_fim);
             if (inicio.compareTo(fim) > 0) {
-                // todo: erro
                 PlannerSemanticoUtils.adicionarErroSemantico(
                         ctx.start,
                         String.format(Mensagens.ERRO_INICIO_FIM_INCOMPATIVES, ctx.dia_inicio.getText(),
@@ -83,12 +99,10 @@ public class PlannerSemanticoUtils {
                 int fHora = Integer.parseInt(ctx.horario_fim.hora.getText());
                 int fMinuto = Integer.parseInt(ctx.horario_fim.minuto.getText());
                 fHorario = LocalTime.of(fHora, fMinuto);
-
             }
 
             if (iDia.compareTo(fDia) > 0 ||
                     iDia.compareTo(fDia) == 0 && iHorario.compareTo(fHorario) > 0) {
-                // todo: erro de intervalo
                 PlannerSemanticoUtils.adicionarErroSemantico(
                         ctx.start,
                         String.format(Mensagens.ERRO_INICIO_FIM_INCOMPATIVES, ctx.dia_inicio.getText(),
@@ -146,7 +160,6 @@ public class PlannerSemanticoUtils {
         }
 
         Calendar cal =  Calendar.getInstance();
-        System.out.println(diaDaSemana.getValue());
         cal.set(2021, Calendar.NOVEMBER, 20 + diaDaSemana.getValue(), hora, minuto);
         return cal;
     }
