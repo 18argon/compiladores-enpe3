@@ -141,4 +141,62 @@ public class GeradorHTML extends PlannerBaseVisitor<Void> {
         }
         return null;
     }
+
+    @Override
+    public Void visitCorpo_semanal(PlannerParser.Corpo_semanalContext ctx){
+        // Styles
+        saida.append(GeradorHTMLUtils.SEMANAL_STYLES);
+        saida.append("</head>\n<body>\n");
+
+        saida.append("<div class=\"container\">\n")
+                .append("<h1>Planner Semanal")
+                .append("</h1>")
+                .append("<div class=\"calendar\">\n");
+
+        // Obter todas as tarefas
+        ctx.tarefa_semanal().forEach(this::visitTarefa_semanal);
+        // gerar o html
+        for(int i = 1; i <= 7; i++){
+            List<Tarefa> tarefas = tds.get(i);
+            saida.append("<div class=\"dia-da-semana\">\n")
+                    .append("<h3>")
+                    .append(i)
+                    .append("</h3>\n<ul>\n");
+            if(tarefas != null){
+                for(var tarefa : tarefas){
+                    saida.append("<li>")
+                            .append(tarefa.getDescricao())
+                            .append("</li>\n");
+                }
+            }
+            saida.append("</ul>\n</div>\n");
+        }
+        saida.append("</div>\n")
+                .append("<h2>Tarefas</h2>\n")
+                .append("<div class=\"container-tarefa\">\n");
+
+        for (int i = 1; i <= 7; i++) {
+            List<Tarefa> tarefas = tds.get(i);
+            if (tarefas != null) {
+
+                for (var tarefa : tarefas) {
+                    saida.append("<div class=\"tarefa\">\n");
+                    saida.append("<h4>")
+                            .append(tarefa.getId())
+                            .append("</h4>\n");
+                    saida.append("<p><span class=\"bold\">Inicio:</span>")
+                            .append(formatDate(tarefa.getInicio()))
+                            .append(" - <span class=\"bold\">Fim:</span>")
+                            .append(formatDate(tarefa.getFim()))
+                            .append("</p>\n");
+                    saida.append("<p><span class=\"bold\">Descrição:</span>")
+                            .append(tarefa.getDescricao())
+                            .append("</p>\n");
+                    saida.append("</div>\n");
+                }
+            }
+        }
+        saida.append("</div>\n</div>\n");
+        return null;
+    }
 }
