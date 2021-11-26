@@ -1,0 +1,16 @@
+planner mensal{
+    mes: 02/2022
+
+    Viagem{
+        inicio: 26 13:00
+        fim: 29 10:00
+        descricao: "viagem a passeio"
+    }
+
+    Leitura{
+        inicio: 19 14:20
+        fim: 21 17:30
+        descricao: "livro de literatura"
+    }
+
+}
