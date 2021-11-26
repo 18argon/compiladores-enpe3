@@ -1,6 +1,20 @@
-package br.ufscar.dc.compiladores.planner;
+package br.ufscar.dc.compiladores.planner.gerador;
 
+/*
+    Utilitários usados na geração da saida HTML
+ */
 public class GeradorHTMLUtils {
+
+    public static int DIAS_NA_SEMANA = 7;
+
+    public static int MESES_NO_ANO = 12;
+
+    public static final String[] meses = {"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+            "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"};
+
+    public static final String[] diasDaSemana = {"Domingo", "Segunda-feira", "Terça-feira",
+            "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"};
+
     public static final String ANUAL_STYLES = "<style>\n" +
             "        .container {\n" +
             "            padding: 0 5%;\n" +

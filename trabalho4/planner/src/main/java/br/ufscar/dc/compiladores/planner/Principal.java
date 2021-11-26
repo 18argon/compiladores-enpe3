@@ -1,5 +1,8 @@
 package br.ufscar.dc.compiladores.planner;
 
+import br.ufscar.dc.compiladores.planner.gerador.GeradorHTML;
+import br.ufscar.dc.compiladores.planner.semantico.PlannerSemantico;
+import br.ufscar.dc.compiladores.planner.semantico.PlannerSemanticoUtils;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -32,7 +35,6 @@ public class Principal {
 
             CommonTokenStream tokens = new CommonTokenStream(lexer);
 
-
             PlannerParser parser = new PlannerParser(tokens);
             parser.removeErrorListeners();
             parser.addErrorListener(cel);
@@ -45,6 +47,7 @@ public class Principal {
                 PlannerSemanticoUtils.errosSemanticos.forEach(pw::println);
                 pw.println("Fim da compilacao");
             } else {
+                // Se não houver erros, gerar saida HTML
                 GeradorHTML gh = new GeradorHTML();
                 gh.visitPrograma(arvore);
                 pw.write(gh.saida.toString());

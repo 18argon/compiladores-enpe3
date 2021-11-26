@@ -9,43 +9,41 @@ import java.io.PrintWriter;
 import java.util.BitSet;
 
 //Classe responsável por customizar as mensagens de erro
-public class CustomErrorListener  implements ANTLRErrorListener {
-    
+public class CustomErrorListener implements ANTLRErrorListener {
     //Variável para escrever no arquivo .txt
     PrintWriter pw;
 
     public CustomErrorListener(PrintWriter pw) {
         this.pw = pw;
     }
-    
+
     @Override
-    public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e){
+    public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
         Token t = (Token) offendingSymbol;
         String message;
         String tokenTypeName = PlannerLexer.VOCABULARY.getDisplayName(t.getType());
-        
+        int charPosition = t.getCharPositionInLine();
+
         //Verifica se o erro é devido a um caractere desconhecido
         if (tokenTypeName.equals("DESCONHECIDO")) {
             String invalidChar = t.getText();
-            
+
             //Erro devido ao não fechamento de comentário
             if (invalidChar.equals("/*")) {
-                message = "Linha " + line + ": comentario nao fechado";
+                message = "Linha " + line + ":" + charPosition + " comentario nao fechado";
             } else {        //Erro devido ao não reconhecimento de símbolos
-                message = "Linha " + line + ": " + t.getText() + " - simbolo nao identificado";
+                message = "Linha " + line + ":" + charPosition + " " + t.getText() + " - simbolo nao identificado";
             }
         } else if (t.getType() == Token.EOF) {      //Erro devido à não finalização do algoritmo
-            message = "Linha " + line + ": erro sintatico proximo a EOF";
+            message = "Linha " + line + ":" + charPosition + " erro sintatico proximo a EOF";
         } else {        //Erro sintático
-            message = "Linha " + line + ": erro sintatico proximo a " + t.getText();
+            message = "Linha " + line + ":" + charPosition + " erro sintatico proximo a " + t.getText();
         }
 
         pw.write(message + "\n");
         pw.write("Fim da compilacao\n");
         throw new ParseCancellationException("Fim");
-        
     }
-    
 
     @Override
     public void reportAmbiguity(Parser parser, DFA dfa, int i, int i1, boolean b, BitSet bitSet, ATNConfigSet atnConfigSet) {

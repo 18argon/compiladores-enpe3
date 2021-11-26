@@ -1,11 +1,16 @@
-package br.ufscar.dc.compiladores.planner;
+package br.ufscar.dc.compiladores.planner.semantico;
 
+import br.ufscar.dc.compiladores.planner.Mensagens;
+import br.ufscar.dc.compiladores.planner.PlannerParser;
 import org.antlr.v4.runtime.Token;
 
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.*;
 
+/*
+    Utilitários para o Analisador Semântico
+ */
 public class PlannerSemanticoUtils {
     
     public static List<String> errosSemanticos = new ArrayList<>();
@@ -39,6 +44,9 @@ public class PlannerSemanticoUtils {
         return true;
     }
 
+    /*
+        Verifica se as datas estão corretas e se representam um intervalo válido
+     */
     public static void verificarIntervalo(int ano, PlannerParser.Data_anualContext ctx) {
         boolean datasCorretas = verificarDiaMes(ano, ctx.dia_inicio);
         if (ctx.dia_fim != null) {
@@ -60,6 +68,9 @@ public class PlannerSemanticoUtils {
         }
     }
 
+    /*
+        Verifica se as datas estão corretas e se representam um intervalo válido
+     */
     public static void verificarIntervalo(int ano, int mes, PlannerParser.Data_mensalContext ctx) {
         boolean datasCorretas = verificarDiaDoMes(ano, mes, ctx.dia_inicio);
         if (ctx.dia_fim != null) {
@@ -81,6 +92,9 @@ public class PlannerSemanticoUtils {
         }
     }
 
+    /*
+        Verifica se as datas estão corretas e se representam um intervalo válido
+     */
     public static void verificarIntervalo(PlannerParser.Data_semanalContext ctx) {
         int iDia = getDiaDaSemana(ctx.dia_inicio);
         LocalTime iHorario = LocalTime.of(0, 0);
