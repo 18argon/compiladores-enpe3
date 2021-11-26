@@ -57,59 +57,53 @@ public class GeradorHTMLUtils {
             "        }\n" +
             "    </style>";
 
-    public static final String SEMANAL_STYLES = "       <style>"
-            +"        .container {"
-            +"    margin: auto 20px;"
-            +"}"
-            +"    .calendar {"
-            +"    display: flex;"
-            +"}"
-            +"    .dia-da-semana {"
-            +"    min-width: 180px;"
-            +"    border: 1px solid black;"
-            +"}"
-            +"    .container-tarefa {"
-            +"    justify-content: space-between;"
-            +"    display: flex;"
-            +"    flex-wrap: wrap;"
-            +"}"
-            +"    .tarefa {"
-            +"    width: 45%;"
-            +"}"
-            +"    .mes {"
-            +"    margin: 5px;"
-            +"    width: 45%;"
-            +"    min-height: 300px;"
-            +"    border: 2px solid black;"
-            +"    border-radius: 3%;"
-            +"}"
-            +"h1 {"
-            +"    text-align: center;"
-            +"}"
-            +"h3 {"
-            +"    margin: 0;"
-            +"    padding: 15px;"
-            +"    text-align: center;"
-            +"}"
-            +"ul {"
-            +"    list-style-type: none;"
-            +"    margin: 0 20px;"
-            +"    padding: 0;"
-            +"}"
-            +"li {"
-            +"    margin-bottom: 5px;"
-            +"    font-size: 1rem;"
-            +"    white-space: nowrap;"
-            +"    overflow: hidden;"
-            +"    text-overflow: ellipsis;"
-            +"}"
-            +"li:hover {"
-            +"    display: inline-block;"
-            +"    overflow: visible;"
-            +"    background-color: yellow;"
-            +"}"
-            +"    .bold {"
-            +"    font-weight: bold;"
-            +"}"
-            +"</style>";
+    public static final String SEMANAL_STYLES = "    <style>\n" +
+            "        .container {\n" +
+            "            margin: auto 20px;\n" +
+            "        }\n" +
+            "        .calendar {\n" +
+            "            display: flex;\n" +
+            "        }\n" +
+            "        .dia-da-semana {\n" +
+            "            min-width: 180px;\n" +
+            "            border: 1px solid black;\n" +
+            "        }\n" +
+            "        .container-tarefa {\n" +
+            "            justify-content: space-between;\n" +
+            "            display: flex;\n" +
+            "            flex-wrap: wrap;\n" +
+            "        }\n" +
+            "        .tarefa {\n" +
+            "            width: 45%;\n" +
+            "        }\n" +
+            "        h1 {\n" +
+            "            text-align: center;\n" +
+            "        }\n" +
+            "        h3 {\n" +
+            "            margin: 0;\n" +
+            "            padding: 15px;\n" +
+            "            text-align: center;\n" +
+            "        }\n" +
+            "        ul {\n" +
+            "            list-style-type: none;\n" +
+            "            margin: 0 20px;\n" +
+            "            padding: 0;\n" +
+            "        }\n" +
+            "        li {\n" +
+            "            margin-bottom: 5px;\n" +
+            "            font-size: 1rem;\n" +
+            "            white-space: nowrap;\n" +
+            "            overflow: hidden;\n" +
+            "            text-overflow: ellipsis;\n" +
+            "        }\n" +
+            "        li:hover {\n" +
+            "            display: inline-block;\n" +
+            "            overflow: visible;\n" +
+            "            background-color: yellow;\n" +
+            "\n" +
+            "        }\n" +
+            "        .bold {\n" +
+            "            font-weight: bold;\n" +
+            "        }\n" +
+            "    </style>\n";
 }

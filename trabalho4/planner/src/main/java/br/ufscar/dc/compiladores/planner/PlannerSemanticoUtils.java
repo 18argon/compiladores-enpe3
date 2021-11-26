@@ -132,6 +132,24 @@ public class PlannerSemanticoUtils {
         cal.set(ano, mes-1, dia, hora, minuto);
         return cal;
     }
+    public static Calendar parseData(PlannerParser.Dia_da_semanaContext diaDaSemanaCtx,
+                                     PlannerParser.HorarioContext horarioCtx) {
+        DayOfWeek diaDaSemana = getDiaDaSemana(diaDaSemanaCtx);
+        int hora;
+        int minuto;
+        if (horarioCtx != null) {
+            hora = Integer.parseInt(horarioCtx.hora.getText());
+            minuto = Integer.parseInt(horarioCtx.minuto.getText());
+        } else {
+            hora = 0;
+            minuto = 0;
+        }
+
+        Calendar cal =  Calendar.getInstance();
+        System.out.println(diaDaSemana.getValue());
+        cal.set(2021, Calendar.NOVEMBER, 20 + diaDaSemana.getValue(), hora, minuto);
+        return cal;
+    }
 
     private static DayOfWeek getDiaDaSemana(PlannerParser.Dia_da_semanaContext ctx) {
         switch (ctx.start.getType()) {

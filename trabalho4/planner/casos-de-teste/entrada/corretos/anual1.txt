@@ -5,11 +5,11 @@ planner anual {
     }
 
     Inscricao_Curso{
-        inicio: 15/01 15:00
-        fim: 16/01 16:00
+        inicio: 15/11 15:00
+        fim: 16/11 16:00
     }
 
     Viagem{
-        inicio: 04/01 08:00
+        inicio: 04/09 08:00
     }
 }

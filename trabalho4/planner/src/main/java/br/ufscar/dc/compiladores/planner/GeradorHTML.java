@@ -17,6 +17,16 @@ public class GeradorHTML extends PlannerBaseVisitor<Void> {
     String[] meses = {"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
             "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"};
 
+    String[] diasDaSemana = {
+            "Domingo",
+            "Segunda-feira",
+            "Terça-feira",
+            "Quarta-feira",
+            "Quinta-feira",
+            "Sexta-feira",
+            "Sábado",
+    };
+
     public GeradorHTML() {
         saida = new StringBuilder();
         tds = new HashMap<>();
@@ -137,6 +147,12 @@ public class GeradorHTML extends PlannerBaseVisitor<Void> {
         return dateFormat.format(c.getTime());
     }
 
+    private String formatDate_semanal(Calendar c) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(" [HH:mm]");
+
+        return diasDaSemana[c.get(Calendar.DAY_OF_WEEK)] + dateFormat.format(c.getTime());
+    }
+
     @Override
     public Void visitCorpo_mensal(PlannerParser.Corpo_mensalContext ctx){
         int anoNum = Integer.parseInt(ctx.campo_mes().ano.getText());
@@ -178,6 +194,30 @@ public class GeradorHTML extends PlannerBaseVisitor<Void> {
     @Override
     public Void visitCorpo_semanal(PlannerParser.Corpo_semanalContext ctx){
         int DIAS_NA_SEMANA = 7;
+        for (var tarefa :
+                ctx.tarefa_semanal()) {
+
+            Calendar inicio = PlannerSemanticoUtils.parseData(
+                    tarefa.data_semanal().dia_inicio, tarefa.data_semanal().horario_inicio);
+            Calendar fim;
+            if (tarefa.data_semanal().dia_fim != null) {
+                fim = PlannerSemanticoUtils.parseData(
+                        tarefa.data_semanal().dia_fim, tarefa.data_semanal().horario_fim);
+            } else {
+                fim = inicio;
+            }
+            String descricao;
+            if (tarefa.campo_descricao() != null) {
+                descricao = tarefa.campo_descricao().DESCRICAO().getText();
+            } else {
+                descricao = "";
+            }
+            String id = tarefa.TAREFA().getText();
+
+            Integer key = inicio.get(Calendar.DAY_OF_WEEK);
+            tds.computeIfAbsent(key, k -> new ArrayList<>());
+            tds.get(key).add(new Tarefa(id, inicio, fim, descricao));
+        }
 
         // Styles
         saida.append("<title>Planner Semanal</title>\n");
@@ -189,19 +229,17 @@ public class GeradorHTML extends PlannerBaseVisitor<Void> {
                 .append("</h1>")
                 .append("<div class=\"calendar\">\n");
 
-        // Obter todas as tarefas
-        ctx.tarefa_semanal().forEach(this::visitTarefa_semanal);
         // gerar o html
-        for(int i = 1; i <= DIAS_NA_SEMANA; i++){
+        for(int i = 0; i < DIAS_NA_SEMANA; i++){
             List<Tarefa> tarefas = tds.get(i);
             saida.append("<div class=\"dia-da-semana\">\n")
                     .append("<h3>")
-                    .append(i)
+                    .append(diasDaSemana[i])
                     .append("</h3>\n<ul>\n");
             if(tarefas != null){
                 for(var tarefa : tarefas){
                     saida.append("<li>")
-                            .append(tarefa.getDescricao())
+                            .append(tarefa.getId())
                             .append("</li>\n");
                 }
             }
@@ -211,7 +249,7 @@ public class GeradorHTML extends PlannerBaseVisitor<Void> {
                 .append("<h2>Tarefas</h2>\n")
                 .append("<div class=\"container-tarefa\">\n");
 
-        for (int i = 1; i <= DIAS_NA_SEMANA; i++) {
+        for (int i = 0; i < DIAS_NA_SEMANA; i++) {
             List<Tarefa> tarefas = tds.get(i);
             if (tarefas != null) {
 
@@ -220,10 +258,10 @@ public class GeradorHTML extends PlannerBaseVisitor<Void> {
                     saida.append("<h4>")
                             .append(tarefa.getId())
                             .append("</h4>\n");
-                    saida.append("<p><span class=\"bold\">Inicio:</span>")
-                            .append(formatDate(tarefa.getInicio()))
-                            .append(" - <span class=\"bold\">Fim:</span>")
-                            .append(formatDate(tarefa.getFim()))
+                    saida.append("<p><span class=\"bold\">Inicio: </span>")
+                            .append(formatDate_semanal(tarefa.getInicio()))
+                            .append(" - <span class=\"bold\">Fim: </span>")
+                            .append(formatDate_semanal(tarefa.getFim()))
                             .append("</p>\n");
                     saida.append("<p><span class=\"bold\">Descrição:</span>")
                             .append(tarefa.getDescricao())
