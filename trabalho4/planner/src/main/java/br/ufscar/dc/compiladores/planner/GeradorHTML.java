@@ -149,8 +149,7 @@ public class GeradorHTML extends PlannerBaseVisitor<Void> {
 
     private String formatDate_semanal(Calendar c) {
         SimpleDateFormat dateFormat = new SimpleDateFormat(" [HH:mm]");
-
-        return diasDaSemana[c.get(Calendar.DAY_OF_WEEK)] + dateFormat.format(c.getTime());
+        return diasDaSemana[c.get(Calendar.DAY_OF_WEEK) - 1] + dateFormat.format(c.getTime());
     }
 
     @Override
@@ -237,7 +236,6 @@ public class GeradorHTML extends PlannerBaseVisitor<Void> {
         int DIAS_NA_SEMANA = 7;
         for (var tarefa :
                 ctx.tarefa_semanal()) {
-
             Calendar inicio = PlannerSemanticoUtils.parseData(
                     tarefa.data_semanal().dia_inicio, tarefa.data_semanal().horario_inicio);
             Calendar fim;

@@ -2,7 +2,6 @@ package br.ufscar.dc.compiladores.planner;
 
 import org.antlr.v4.runtime.Token;
 
-import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.*;
@@ -83,7 +82,7 @@ public class PlannerSemanticoUtils {
     }
 
     public static void verificarIntervalo(PlannerParser.Data_semanalContext ctx) {
-        DayOfWeek iDia = getDiaDaSemana(ctx.dia_inicio);
+        int iDia = getDiaDaSemana(ctx.dia_inicio);
         LocalTime iHorario = LocalTime.of(0, 0);
         if (ctx.horario_inicio != null) {
             int iHora = Integer.parseInt(ctx.horario_inicio.hora.getText());
@@ -92,7 +91,7 @@ public class PlannerSemanticoUtils {
         }
 
         if (ctx.dia_fim != null) {
-            DayOfWeek fDia = getDiaDaSemana(ctx.dia_fim);
+            int fDia = getDiaDaSemana(ctx.dia_fim);
             LocalTime fHorario = LocalTime.of(0, 0);
 
             if (ctx.horario_fim != null) {
@@ -101,8 +100,8 @@ public class PlannerSemanticoUtils {
                 fHorario = LocalTime.of(fHora, fMinuto);
             }
 
-            if (iDia.compareTo(fDia) > 0 ||
-                    iDia.compareTo(fDia) == 0 && iHorario.compareTo(fHorario) > 0) {
+            if (iDia > fDia ||
+                    iDia == fDia && iHorario.compareTo(fHorario) > 0) {
                 PlannerSemanticoUtils.adicionarErroSemantico(
                         ctx.start,
                         String.format(Mensagens.ERRO_INICIO_FIM_INCOMPATIVES, ctx.dia_inicio.getText(),
@@ -148,7 +147,7 @@ public class PlannerSemanticoUtils {
     }
     public static Calendar parseData(PlannerParser.Dia_da_semanaContext diaDaSemanaCtx,
                                      PlannerParser.HorarioContext horarioCtx) {
-        DayOfWeek diaDaSemana = getDiaDaSemana(diaDaSemanaCtx);
+        int diaDaSemana = getDiaDaSemana(diaDaSemanaCtx);
         int hora;
         int minuto;
         if (horarioCtx != null) {
@@ -160,26 +159,26 @@ public class PlannerSemanticoUtils {
         }
 
         Calendar cal =  Calendar.getInstance();
-        cal.set(2021, Calendar.NOVEMBER, 20 + diaDaSemana.getValue(), hora, minuto);
+        cal.set(2021, Calendar.NOVEMBER, 20 + diaDaSemana, hora, minuto);
         return cal;
     }
 
-    private static DayOfWeek getDiaDaSemana(PlannerParser.Dia_da_semanaContext ctx) {
+    private static int getDiaDaSemana(PlannerParser.Dia_da_semanaContext ctx) {
         switch (ctx.start.getType()) {
+            case PlannerParser.DOMINGO:
+                return 0;
             case PlannerParser.SEGUNDA:
-                return DayOfWeek.MONDAY;
+                return 1;
             case PlannerParser.TERCA:
-                return DayOfWeek.TUESDAY;
+                return 2;
             case PlannerParser.QUARTA:
-                return DayOfWeek.WEDNESDAY;
+                return 3;
             case PlannerParser.QUINTA:
-                return DayOfWeek.THURSDAY;
+                return 4;
             case PlannerParser.SEXTA:
-                return DayOfWeek.FRIDAY;
-            case PlannerParser.SABADO:
-                return DayOfWeek.SATURDAY;
-            default: // PlannerParser.DOMINGO:
-                return DayOfWeek.SUNDAY;
+                return 5;
+            default: // PlannerParser.SABADO:
+                return 6;
         }
     }
 }
