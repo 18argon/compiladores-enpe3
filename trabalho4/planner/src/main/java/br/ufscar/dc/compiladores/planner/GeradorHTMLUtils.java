@@ -84,6 +84,9 @@ public class GeradorHTMLUtils {
             "            padding: 15px;\n" +
             "            text-align: center;\n" +
             "        }\n" +
+            "        h4 {\n" +
+            "            font-style: italic;\n" +
+            "        }\n" +
             "        ul {\n" +
             "            list-style-type: none;\n" +
             "            margin: 0 20px;\n" +
@@ -106,4 +109,43 @@ public class GeradorHTMLUtils {
             "            font-weight: bold;\n" +
             "        }\n" +
             "    </style>\n";
+
+    public static final String MENSAL_STYLES = "<style>\n" +
+            "        .container {\n" +
+            "            margin: auto 20px;\n" +
+            "        }\n" +
+            "        .dia-da-semana {\n" +
+            "            min-width: 180px;\n" +
+            "            border: 1px solid black;\n" +
+            "        }\n" +
+            "        .tarefa {\n" +
+            "            width: 100%;\n" +
+            "        }\n" +
+            "        h1 {\n" +
+            "            text-align: center;\n" +
+            "        }\n" +
+            "        h3 {\n" +
+            "            margin: 0;\n" +
+            "            padding: 15px;\n" +
+            "            text-align: left;\n" +
+            "        }\n" +
+            "        h4 {\n" +
+            "            font-style: italic;\n" +
+            "        }\n" +
+            "        ul {\n" +
+            "            list-style-type: none;\n" +
+            "            margin: 0 20px;\n" +
+            "            padding: 0;\n" +
+            "        }\n" +
+            "        li {\n" +
+            "            margin-bottom: 5px;\n" +
+            "            font-size: 1rem;\n" +
+            "            white-space: nowrap;\n" +
+            "            overflow: hidden;\n" +
+            "            text-overflow: ellipsis;\n" +
+            "        }\n" +
+            "        .bold {\n" +
+            "            font-weight: bold;\n" +
+            "        }\n" +
+            "    </style>";
 }
