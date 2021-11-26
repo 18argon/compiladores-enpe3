@@ -1,0 +1,21 @@
+planner anual {
+    ano: 2022
+    Inscricao{
+        inicio: 15/01 15:00
+    }
+
+    Inscricao_Curso{
+        inicio: 15/11 15:00
+        fim: 16/11 16:00
+    }
+
+    Viagem{
+        inicio: 04/09 08:00
+        fim: 10/09 10:00
+    }
+    
+    Aulas{
+        inicio: 17/02 08:00
+        fim: 29/11 23:59
+    }
+}

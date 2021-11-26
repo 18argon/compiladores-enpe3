@@ -1,0 +1,22 @@
+/*erro fechamento da descricao*/
+planner semanal{
+    Inscricao{
+        inicio: segunda 15:00
+    }
+
+    Inscricao_Curso{
+        inicio: terca 15:00
+        fim: sexta 16:00
+    }
+
+    Viagem{
+        inicio: quinta
+        fim: domingo
+    }
+    
+    Aulas{
+        inicio: segunda 08:00
+        fim: sexta 23:59
+        descricao: "as aulas vao ate sexta da semana que vem
+    }
+}

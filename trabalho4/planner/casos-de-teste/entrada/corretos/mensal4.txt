@@ -1,0 +1,22 @@
+/*exemplo de ordenacao das datas*/
+planner mensal {
+    mes: 05/2022
+    Inscricao{
+        inicio: 15 15:00
+    }
+
+    Inscricao_Curso{
+        inicio: 17 15:00
+        fim: 21 16:00
+    }
+
+    Viagem{
+        inicio: 04 08:00
+        fim: 10 10:00
+    }
+    
+    Aulas{
+        inicio: 17 08:00
+        fim: 29 23:59
+    }
+}
