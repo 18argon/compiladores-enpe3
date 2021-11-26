@@ -98,7 +98,7 @@ public class PlannerSemanticoUtils {
         }
     }
 
-    private static Calendar parseData(int ano, int mes, PlannerParser.Dia_do_mesContext diaCtx, PlannerParser.HorarioContext horarioCtx) {
+    public static Calendar parseData(int ano, int mes, PlannerParser.Dia_do_mesContext diaCtx, PlannerParser.HorarioContext horarioCtx) {
         int dia = Integer.parseInt(diaCtx.getText());
         int hora;
         int minuto;
@@ -115,7 +115,7 @@ public class PlannerSemanticoUtils {
         return cal;
     }
 
-    private static Calendar parseData(int ano, PlannerParser.Dia_mesContext diaMesContext, PlannerParser.HorarioContext horarioCtx) {
+    public static Calendar parseData(int ano, PlannerParser.Dia_mesContext diaMesContext, PlannerParser.HorarioContext horarioCtx) {
         int dia = Integer.parseInt(diaMesContext.dia.getText());
         int mes = Integer.parseInt(diaMesContext.mes.getText());
         int hora;

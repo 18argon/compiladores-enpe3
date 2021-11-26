@@ -5,6 +5,7 @@
  */
 package br.ufscar.dc.compiladores.planner;
 
+import java.text.SimpleDateFormat;
 import java.time.YearMonth;
 import java.util.*;
 
@@ -12,6 +13,9 @@ public class GeradorHTML extends PlannerBaseVisitor<Void> {
 
     Map<Integer, ArrayList<Tarefa>> tds;
     StringBuilder saida;
+
+    String[] meses = {"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+            "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"};
 
     public GeradorHTML() {
         saida = new StringBuilder();
@@ -34,6 +38,7 @@ public class GeradorHTML extends PlannerBaseVisitor<Void> {
     @Override
     public Void visitCorpo_anual(PlannerParser.Corpo_anualContext ctx) {
         // Styles
+        saida.append("<title>Planner Anual</title>\n");
         saida.append(GeradorHTMLUtils.ANUAL_STYLES);
         saida.append("</head>\n<body>\n");
         //
@@ -44,17 +49,41 @@ public class GeradorHTML extends PlannerBaseVisitor<Void> {
                 .append("<div class=\"calendar\">\n");
 
         // Obter todas as tarefas
-        ctx.tarefa_anual().forEach(this::visitTarefa_anual);
+        int ano = Integer.parseInt(ctx.campo_ano().ano.getText());
+        for (var tarefa :
+                ctx.tarefa_anual()) {
+            Calendar inicio = PlannerSemanticoUtils.parseData(ano,
+                    tarefa.data_anual().dia_inicio, tarefa.data_anual().horario_inicio);
+            Calendar fim;
+            if (tarefa.data_anual().dia_fim != null) {
+                fim = PlannerSemanticoUtils.parseData(ano,
+                        tarefa.data_anual().dia_fim, tarefa.data_anual().horario_fim);
+            } else {
+                fim = inicio;
+            }
+            String descricao;
+            if (tarefa.campo_descricao() != null) {
+                descricao = tarefa.campo_descricao().DESCRICAO().getText();
+            } else {
+                descricao = "";
+            }
+            String id = tarefa.TAREFA().getText();
+
+            Integer key = inicio.get(Calendar.MONTH);
+            tds.computeIfAbsent(key, k -> new ArrayList<>());
+            tds.get(key).add(new Tarefa(id, inicio, fim, descricao));
+        }
+
         // gerar o html
-        for (int i = 1; i <= 12; i++) {
+        for (int i = 0; i < 12; i++) {
             List<Tarefa> tarefas = tds.get(i);
             saida.append("<div class=\"mes\">\n")
                     .append("<h3 class=\"titulo-mes\">")
-                    .append(i) // todo: mudar para nome do mês
+                    .append(meses[i]) // todo: mudar para nome do mês
                     .append("</h3>\n<ul>\n");
             if (tarefas != null) {
                 for (var tarefa : tarefas) {
-                    saida.append("<li><span class=\"bold\">");
+                    saida.append("<li><a href=\"#").append(tarefa.getId()).append("\"><span class=\"bold\">");
                     int iDia = tarefa.getInicio().get(Calendar.DATE);
                     int fDia = tarefa.getFim().get(Calendar.DATE);
                     if (iDia != fDia) {
@@ -62,9 +91,9 @@ public class GeradorHTML extends PlannerBaseVisitor<Void> {
                     } else {
                         saida.append(iDia);
                     }
-                    saida.append(":</span>")
-                            .append(tarefa.getDescricao())
-                            .append("</li>\n");
+                    saida.append(": </span>")
+                            .append(tarefa.getId())
+                            .append("</a></li>\n");
                 }
             }
             saida.append("</ul>\n</div>\n");
@@ -74,18 +103,20 @@ public class GeradorHTML extends PlannerBaseVisitor<Void> {
                 .append("<h2>Tarefas</h2>\n")
                 .append("<div class=\"container-tarefa\">\n");
 
-        for (int i = 1; i <= 12; i++) {
+        for (int i = 0; i < 12; i++) {
             List<Tarefa> tarefas = tds.get(i);
             if (tarefas != null) {
 
                 for (var tarefa : tarefas) {
-                    saida.append("<div class=\"tarefa\">\n");
+                    saida.append("<div id=\"")
+                            .append(tarefa.getId())
+                            .append("\" class=\"tarefa\">\n");
                     saida.append("<h4>")
                             .append(tarefa.getId())
                             .append("</h4>\n");
-                    saida.append("<p><span class=\"bold\">Inicio:</span>")
+                    saida.append("<p><span class=\"bold\">Inicio: </span>")
                             .append(formatDate(tarefa.getInicio()))
-                            .append(" - <span class=\"bold\">Fim:</span>")
+                            .append(" - <span class=\"bold\">Fim: </span>")
                             .append(formatDate(tarefa.getFim()))
                             .append("</p>\n");
                     saida.append("<p><span class=\"bold\">Descrição:</span>")
@@ -101,7 +132,9 @@ public class GeradorHTML extends PlannerBaseVisitor<Void> {
     }
 
     private String formatDate(Calendar c) {
-        return "";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM [HH:mm]");
+
+        return dateFormat.format(c.getTime());
     }
 
     @Override
@@ -144,7 +177,10 @@ public class GeradorHTML extends PlannerBaseVisitor<Void> {
 
     @Override
     public Void visitCorpo_semanal(PlannerParser.Corpo_semanalContext ctx){
+        int DIAS_NA_SEMANA = 7;
+
         // Styles
+        saida.append("<title>Planner Semanal</title>\n");
         saida.append(GeradorHTMLUtils.SEMANAL_STYLES);
         saida.append("</head>\n<body>\n");
 
@@ -156,7 +192,7 @@ public class GeradorHTML extends PlannerBaseVisitor<Void> {
         // Obter todas as tarefas
         ctx.tarefa_semanal().forEach(this::visitTarefa_semanal);
         // gerar o html
-        for(int i = 1; i <= 7; i++){
+        for(int i = 1; i <= DIAS_NA_SEMANA; i++){
             List<Tarefa> tarefas = tds.get(i);
             saida.append("<div class=\"dia-da-semana\">\n")
                     .append("<h3>")
@@ -175,7 +211,7 @@ public class GeradorHTML extends PlannerBaseVisitor<Void> {
                 .append("<h2>Tarefas</h2>\n")
                 .append("<div class=\"container-tarefa\">\n");
 
-        for (int i = 1; i <= 7; i++) {
+        for (int i = 1; i <= DIAS_NA_SEMANA; i++) {
             List<Tarefa> tarefas = tds.get(i);
             if (tarefas != null) {
 
