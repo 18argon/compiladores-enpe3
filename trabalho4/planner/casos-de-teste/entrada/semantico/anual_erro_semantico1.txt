@@ -1,0 +1,13 @@
+planner anual{
+    ano: 2022
+    Inscricao{
+        inicio: 10/01 00:00 /*datas de inicio e fim*/
+        fim: 07/01 23:59 
+    }
+    
+    Aulas{
+        inicio: 17/01 08:00
+        fim: 26/11
+    
+    }
+}
