@@ -83,6 +83,7 @@ public class PlannerSemantico extends PlannerBaseVisitor<Void>{
             PlannerSemanticoUtils.verificarDiaMes(ano, tarefa.data_anual().dia_inicio);
             if (tarefa.data_anual().dia_fim != null) {
                 PlannerSemanticoUtils.verificarDiaMes(ano, tarefa.data_anual().dia_fim);
+                PlannerSemanticoUtils.verificarIntervalo(ano, tarefa.data_anual());
             }
         }
         return null;
