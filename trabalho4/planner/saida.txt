@@ -1,2 +1,0 @@
-Linha 1: erro sintatico proximo a semanal
-Fim da compilacao
