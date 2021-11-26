@@ -1,4 +1,4 @@
-pla0ner semanal{
+planner semanal [
 
     natacao{
         inicio: quinta-feira 17:00
