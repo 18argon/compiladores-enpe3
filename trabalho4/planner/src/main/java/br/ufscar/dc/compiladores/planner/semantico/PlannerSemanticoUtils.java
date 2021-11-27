@@ -55,6 +55,16 @@ public class PlannerSemanticoUtils {
         if (!datasCorretas) {
             return;
         }
+        boolean horariosCorretos = true;
+        if (ctx.horario_inicio != null) {
+            horariosCorretos = verificaHorario(ctx.horario_inicio);
+        }
+        if (ctx.horario_fim != null) {
+            horariosCorretos = verificaHorario(ctx.horario_fim) && horariosCorretos;
+        }
+        if (!horariosCorretos) {
+            return;
+        }
         Calendar inicio = parseData(ano, ctx.dia_inicio, ctx.horario_inicio);
         if (ctx.dia_fim != null) { //verifica apenas se dia_fim existir
             Calendar fim = parseData(ano, ctx.dia_fim, ctx.horario_fim);
@@ -79,6 +89,16 @@ public class PlannerSemanticoUtils {
         if (!datasCorretas) {
             return;
         }
+        boolean horariosCorretos = true;
+        if (ctx.horario_inicio != null) {
+            horariosCorretos = verificaHorario(ctx.horario_inicio);
+        }
+        if (ctx.horario_fim != null) {
+            horariosCorretos = verificaHorario(ctx.horario_fim) && horariosCorretos;
+        }
+        if (!horariosCorretos) {
+            return;
+        }
         Calendar inicio = parseData(ano, mes, ctx.dia_inicio, ctx.horario_inicio);
         if (ctx.dia_fim != null) {
             Calendar fim = parseData(ano, mes, ctx.dia_fim, ctx.horario_fim);
@@ -92,10 +112,32 @@ public class PlannerSemanticoUtils {
         }
     }
 
+    private static boolean verificaHorario(PlannerParser.HorarioContext ctx) {
+        int hora = Integer.parseInt(ctx.hora.getText());
+        int minuto = Integer.parseInt(ctx.minuto.getText());
+        if (hora < 0 || 23 < hora || minuto < 0 || 59 < minuto) { //data invalida
+            PlannerSemanticoUtils.adicionarErroSemantico(
+                    ctx.start,
+                    String.format(Mensagens.ERRO_HORARIO_INVALIDO, ctx.getText()));
+            return false;
+        }
+        return true;
+    }
+
     /*
         Verifica se as datas estão corretas e se representam um intervalo válido
      */
     public static void verificarIntervalo(PlannerParser.Data_semanalContext ctx) {
+        boolean horariosCorretos = true;
+        if (ctx.horario_inicio != null) {
+            horariosCorretos = verificaHorario(ctx.horario_inicio);
+        }
+        if (ctx.horario_fim != null) {
+            horariosCorretos = verificaHorario(ctx.horario_fim) && horariosCorretos;
+        }
+        if (!horariosCorretos) {
+            return;
+        }
         int iDia = getDiaDaSemana(ctx.dia_inicio);
         LocalTime iHorario = LocalTime.of(0, 0);
         if (ctx.horario_inicio != null) {

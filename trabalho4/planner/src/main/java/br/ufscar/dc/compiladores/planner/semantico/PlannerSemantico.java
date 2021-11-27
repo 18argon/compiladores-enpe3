@@ -90,13 +90,13 @@ public class PlannerSemantico extends PlannerBaseVisitor<Void> {
 
     @Override
     public Void visitHorario(PlannerParser.HorarioContext ctx) {
-        int hora = Integer.parseInt(ctx.hora.getText());
-        int minuto = Integer.parseInt(ctx.minuto.getText());
-        if (hora < 0 || 23 < hora || minuto < 0 || 59 < minuto) { //data invalida
-            PlannerSemanticoUtils.adicionarErroSemantico(
-                    ctx.start,
-                    String.format(Mensagens.ERRO_HORARIO_INVALIDO, ctx.getText()));
-        }
+//        int hora = Integer.parseInt(ctx.hora.getText());
+//        int minuto = Integer.parseInt(ctx.minuto.getText());
+//        if (hora < 0 || 23 < hora || minuto < 0 || 59 < minuto) { //data invalida
+//            PlannerSemanticoUtils.adicionarErroSemantico(
+//                    ctx.start,
+//                    String.format(Mensagens.ERRO_HORARIO_INVALIDO, ctx.getText()));
+//        }
         return null;
     }
 }
