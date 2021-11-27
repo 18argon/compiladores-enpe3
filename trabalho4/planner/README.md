@@ -1,9 +1,10 @@
 # Planner
+A linguagem Planner possibilita a geração de uma página HTML a partir de um código declarativo simplificado.
+A sua gramática pode ser encontrada [aqui](https://raw.githubusercontent.com/18argon/compiladores-enpe3/main/trabalho4/planner/gramatica.pdf)
+
 Projeto desenvolvido para a disciplina de Construção de Compiladores no período ENPE-2021/1.
 
-[comment]: <> (A linguagem de geração de Planner foi desenvolvida pelos alunos Pabolo e Vanessa, no âmbito do DC/UFSCar.)
-
-A linguagem Planner possibilita a geração de uma página HTML a partir de um código declarativo simplificado.
+A linguagem de geração de Planner foi desenvolvida pelos alunos Pabolo e Vanessa, no âmbito do DC/UFSCar.
 
 ## Grupo:
 - Pabolo Vinícius da Rosa Pires \[760648\]
