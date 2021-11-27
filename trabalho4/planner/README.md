@@ -4,7 +4,11 @@ A sua gramática pode ser encontrada [aqui](https://raw.githubusercontent.com/18
 
 Projeto desenvolvido para a disciplina de Construção de Compiladores no período ENPE-2021/1.
 
-A linguagem de geração de Planner foi desenvolvida pelos alunos Pabolo e Vanessa, no âmbito do DC/UFSCar.
+A linguagem de geração de Planner foi desenvolvida pelos alunos Pabolo e Vanessa, no âmbito do DC/UFSCar. Ela é capaz de gerar páginas HTML
+de planner anual, mensal ou semanal, tarefas anexadas ao planner podem conter datas e horas de início e fim e suas descrições.
+
+O compilador verifica erros léxicos, sintáticos e semânticos tendo como base a gramática da linguagem Planner e faz verificações referentes às
+datas e horas.
 
 ## Grupo:
 - Pabolo Vinícius da Rosa Pires \[760648\]
