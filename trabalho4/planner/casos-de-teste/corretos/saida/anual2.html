@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>Planner anual</title>
+<style>
+        .container {
+            padding: 0 5%;
+        }
+        .calendar {
+            justify-content: space-between;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .container-tarefa {
+            justify-content: space-between;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .tarefa {
+            width: 45%;
+        }
+        .mes {
+            margin: 5px;
+            width: 45%;
+            min-height: 300px;
+            border: 2px solid black;
+            border-radius: 3%;
+        }
+        h1 {
+            text-align: center;
+        }
+        h3 {
+            margin: 0;
+            padding: 15px;
+            text-align: center;
+        }
+        h4 {
+            font-style: italic;
+        }
+        ul {
+            list-style-type: none;
+            margin: 0 20px;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+        li:hover {
+            display: inline-block;
+            overflow: visible;
+            background-color: yellow;
+        }
+        a {
+            text-decoration: none;
+        }
+        .bold {
+            font-weight: bold;
+        }
+    </style></head>
+<body>
+<div class="container">
+<h1>Planner Anual - 2022</h1><div class="calendar">
+<div class="mes">
+<h3 class="titulo-mes">Janeiro</h3>
+<ul>
+<li><a href="#Inscricao"><span class="bold">15: </span>Inscricao</a></li>
+</ul>
+</div>
+<div class="mes">
+<h3 class="titulo-mes">Fevereiro</h3>
+<ul>
+<li><a href="#Aulas"><span class="bold">17-29: </span>Aulas</a></li>
+</ul>
+</div>
+<div class="mes">
+<h3 class="titulo-mes">Março</h3>
+</div>
+<div class="mes">
+<h3 class="titulo-mes">Abril</h3>
+</div>
+<div class="mes">
+<h3 class="titulo-mes">Maio</h3>
+</div>
+<div class="mes">
+<h3 class="titulo-mes">Junho</h3>
+</div>
+<div class="mes">
+<h3 class="titulo-mes">Julho</h3>
+</div>
+<div class="mes">
+<h3 class="titulo-mes">Agosto</h3>
+</div>
+<div class="mes">
+<h3 class="titulo-mes">Setembro</h3>
+<ul>
+<li><a href="#Viagem"><span class="bold">4-10: </span>Viagem</a></li>
+</ul>
+</div>
+<div class="mes">
+<h3 class="titulo-mes">Outubro</h3>
+</div>
+<div class="mes">
+<h3 class="titulo-mes">Novembro</h3>
+<ul>
+<li><a href="#Inscricao_Curso"><span class="bold">15-16: </span>Inscricao_Curso</a></li>
+</ul>
+</div>
+<div class="mes">
+<h3 class="titulo-mes">Dezembro</h3>
+</div>
+</div>
+<h2>Tarefas</h2>
+<div class="container-tarefa">
+<div id="Inscricao" class="tarefa">
+<h4>Inscricao</h4>
+<p><span class="bold">Inicio: </span>15/01 [15:00] - <span class="bold">Fim: </span>15/01 [15:00]</p>
+<p><span class="bold">Descrição:</span></p>
+</div>
+<div id="Aulas" class="tarefa">
+<h4>Aulas</h4>
+<p><span class="bold">Inicio: </span>17/02 [08:00] - <span class="bold">Fim: </span>29/11 [23:59]</p>
+<p><span class="bold">Descrição:</span></p>
+</div>
+<div id="Viagem" class="tarefa">
+<h4>Viagem</h4>
+<p><span class="bold">Inicio: </span>04/09 [08:00] - <span class="bold">Fim: </span>10/09 [10:00]</p>
+<p><span class="bold">Descrição:</span></p>
+</div>
+<div id="Inscricao_Curso" class="tarefa">
+<h4>Inscricao_Curso</h4>
+<p><span class="bold">Inicio: </span>15/11 [15:00] - <span class="bold">Fim: </span>16/11 [16:00]</p>
+<p><span class="bold">Descrição:</span></p>
+</div>
+</div>
+</div>
+</body>
+</html>

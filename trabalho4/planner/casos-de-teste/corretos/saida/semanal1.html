@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>Planner Semanal</title>
+    <style>
+        .container {
+            margin: auto 20px;
+        }
+        .calendar {
+            display: flex;
+        }
+        .dia-da-semana {
+            min-width: 180px;
+            border: 1px solid black;
+        }
+        .container-tarefa {
+            justify-content: space-between;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .tarefa {
+            width: 45%;
+        }
+        h1 {
+            text-align: center;
+        }
+        h3 {
+            margin: 0;
+            padding: 15px;
+            text-align: center;
+        }
+        h4 {
+            font-style: italic;
+        }
+        ul {
+            list-style-type: none;
+            margin: 0 20px;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 5px;
+            font-size: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        li:hover {
+            display: inline-block;
+            overflow: visible;
+            background-color: yellow;
+
+        }
+        .bold {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<h1>Planner Semanal</h1><div class="calendar">
+<div class="dia-da-semana">
+<h3>Domingo</h3>
+<ul>
+</ul>
+</div>
+<div class="dia-da-semana">
+<h3>Segunda-feira</h3>
+<ul>
+</ul>
+</div>
+<div class="dia-da-semana">
+<h3>Terça-feira</h3>
+<ul>
+<li>Estudo</li>
+</ul>
+</div>
+<div class="dia-da-semana">
+<h3>Quarta-feira</h3>
+<ul>
+</ul>
+</div>
+<div class="dia-da-semana">
+<h3>Quinta-feira</h3>
+<ul>
+</ul>
+</div>
+<div class="dia-da-semana">
+<h3>Sexta-feira</h3>
+<ul>
+</ul>
+</div>
+<div class="dia-da-semana">
+<h3>Sábado</h3>
+<ul>
+</ul>
+</div>
+</div>
+<h2>Tarefas</h2>
+<div class="container-tarefa">
+<div class="tarefa">
+<h4>Estudo</h4>
+<p><span class="bold">Inicio: </span>Segunda-feira [16:00] - <span class="bold">Fim: </span>Quinta-feira [16:00]</p>
+<p><span class="bold">Descrição: </span>"entrega projeto"</p>
+</div>
+</div>
+</div>
+</body>
+</html>
