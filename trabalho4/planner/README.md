@@ -10,6 +10,8 @@ O compilador é capaz de gerar páginas HTML de planner anual, mensal ou semanal
 início e fim e suas descrições. Ele verifica erros léxicos, sintáticos e semânticos tendo como base a gramática da linguagem Planner e faz 
 verificações referentes às datas e horas.
 
+Exemplos da utilização da linguagem Planner pode ser vista neste [vídeo].(https://youtu.be/yvsnlg7-0HI)
+
 ## Grupo:
 - Pabolo Vinícius da Rosa Pires \[760648\]
 - Vanessa de Cássia Alves  \[795314\]
